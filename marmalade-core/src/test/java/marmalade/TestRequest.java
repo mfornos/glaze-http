@@ -20,22 +20,22 @@ public class TestRequest extends BaseHttpTest
       server.expect(when(any()).path("/reqtest").respond("OK"));
 
       Response response = Marmalade.Post(baseUrl + "/reqtest").bean("hello").as(ContentType.DEFAULT_TEXT).send();
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
 
       response = Marmalade.Get(baseUrl + "/reqtest").send();
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
 
       response = Marmalade.Put(baseUrl + "/reqtest").bean("hello").as(ContentType.DEFAULT_TEXT).send();
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
 
       response = Marmalade.Head(baseUrl + "/reqtest").send();
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
 
       response = Marmalade.Delete(baseUrl + "/reqtest").send();
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
 
       response = Marmalade.Delete(baseUrl + "/reqtest").send(new BasicHttpContext());
-      Assert.assertEquals(response.discardContent().getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.discardContent().status(), HttpStatus.SC_OK);
    }
 
 }

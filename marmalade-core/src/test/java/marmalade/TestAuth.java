@@ -29,7 +29,7 @@ public class TestAuth extends BaseHttpTest
 
       Response response = Marmalade.Get(baseUrl + "/auth/basic").send(client);
 
-      Assert.assertEquals(response.getStatus(), 200);
+      Assert.assertEquals(response.status(), 200);
       Assert.assertEquals(response.asString(), "yellow");
    }
 
@@ -43,7 +43,7 @@ public class TestAuth extends BaseHttpTest
 
       Response response = Marmalade.Get(baseUrl + "/auth/digest").send(client);
 
-      Assert.assertEquals(response.getStatus(), 200);
+      Assert.assertEquals(response.status(), 200);
       Assert.assertEquals(response.asString(), "yellow");
    }
 

@@ -22,7 +22,7 @@ public class TestOAuth extends BaseHttpTest
       server.expect(Condition.when("GET").path("/").header(HttpHeaders.AUTHORIZATION, regex(answer)).respond("yellow", ContentType.DEFAULT_TEXT));
 
       Response response = Get(baseUrl + "/").send();
-      Assert.assertEquals(response.getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.status(), HttpStatus.SC_OK);
    }
 
 }

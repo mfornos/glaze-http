@@ -32,7 +32,7 @@ public class TestAsyncAuth extends BaseHttpTest
       Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/basic").sendAsync(client);
 
       Response response = new Response(fr.get());
-      Assert.assertEquals(response.getStatus(), 200);
+      Assert.assertEquals(response.status(), 200);
       Assert.assertEquals(response.asString(), "yellow");
    }
 
@@ -47,7 +47,7 @@ public class TestAsyncAuth extends BaseHttpTest
       Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/digest").sendAsync(client);
 
       Response response = new Response(fr.get());
-      Assert.assertEquals(response.getStatus(), 200);
+      Assert.assertEquals(response.status(), 200);
       Assert.assertEquals(response.asString(), "yellow");
    }
 

@@ -54,7 +54,7 @@ public class TestSerialization extends BaseHttpTest
       Assert.assertEquals(ContentType.get(entity).getCharset(), ContentType.APPLICATION_ATOM_XML.getCharset());
 
       Response response = client.execute(created);
-      Assert.assertEquals(response.getStatus(), HttpStatus.SC_OK);
+      Assert.assertEquals(response.status(), HttpStatus.SC_OK);
    }
 
    private HttpRequestBase serdeser(HttpUriRequest req) throws FileNotFoundException, IOException,

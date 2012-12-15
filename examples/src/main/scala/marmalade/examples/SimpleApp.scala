@@ -1,36 +1,46 @@
 package marmalade.examples
 
 import marmalade.Marmalade._
-import marmalade.client.handlers.ErrorHandler
+import marmalade.spi.Registry
+import org.apache.http.entity.ContentType
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import marmalade.client.UriBuilder._
+import scala.collection.mutable
 import org.apache.http.HttpResponse
-import org.apache.http.client.ResponseHandler
+import marmalade.client.Response
 
-object SimpleApp {
+object SimpleApp extends AnyRef with MarmaladeHelpers {
 
-  class ErrorHandlerWrap(e: HttpResponse => Unit)
-    extends ErrorHandler {
-    def onError(error: HttpResponse) = e(error)
-  }
-  implicit def ErrorHandlerImplicit(r: HttpResponse => Unit) = new ErrorHandlerWrap(r)
-
-  class ResponseHandlerWrap[T](e: HttpResponse => T)
-    extends ResponseHandler[T] {
-
-    def handleResponse(response: HttpResponse) = e(response)
-  }
-  implicit def ResponseHandlerImplicit[T](r: HttpResponse => T) = new ResponseHandlerWrap[T](r)
+  val googleKey = "YOUR GOOGLE KEY"
 
   def main(args: Array[String]): Unit = {
 
-    val response = Get("http://www.yahoo.com/879854794").withErrorHandler((e: HttpResponse) => println("error" + e)).map()
+    // Register scala module
+    Registry.lookupMapper(ContentType.APPLICATION_JSON).registerModule(DefaultScalaModule);
 
-    val httpResponse: HttpResponse = Get("http://www.yahoo.com/879854794").withHandler((r: HttpResponse) => {
-      println("handle" + r)
-      r;
-    }).send()
+    
+    // JSON results from Freebase
+    
+    val uri = uriBuilderFrom("https://www.googleapis.com/freebase/v1/mqlread").addParameter("query", "{\"id\":\"/en/google\",\"name\":null}").addParameter("key", googleKey).build
+    val result = Get(uri).withErrorHandler((e: HttpResponse) => println("Error: %s".format(e))).map(typeRef[Map[String, String]]);
+    println("Freebase result: %s".format(result("result")))
 
-    println("Hello, world! " + response)
-    println("Hello, world! " + httpResponse)
+    
+    // Simple GET with handler
+    
+    Get("http://www.yahoo.com/").withHandler((r: HttpResponse) => {
+      println("Handling: %s".format(r))
+    }).send[Any]
+
+    
+    // Simple GET without handler
+    
+    Get("http://ask.com/").send[Response].status match {
+      case 200 => println("OK")
+      case x if x > 200 => println(x)
+      case _ => println("WTF?")
+    }
+
   }
 
 }

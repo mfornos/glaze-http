@@ -61,11 +61,6 @@ public class Response
       return wrapped;
    }
 
-   public int getStatus()
-   {
-      return wrapped.getStatusLine().getStatusCode();
-   }
-
    public boolean isError()
    {
       return wrapped.getStatusLine().getStatusCode() >= 300;
@@ -78,7 +73,12 @@ public class Response
 
    public boolean isOk()
    {
-      return getStatus() == HttpStatus.SC_OK;
+      return status() == HttpStatus.SC_OK;
+   }
+
+   public int status()
+   {
+      return wrapped.getStatusLine().getStatusCode();
    }
 
    @Override
