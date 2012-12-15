@@ -1,6 +1,4 @@
 
-
-pre.. 
     __  ___                           __          __   
    /  |/  /___ __________ ___  ____ _/ /___ _____/ /__ 
   / /|_/ / __ `/ ___/ __ `__ \/ __ `/ / __ `/ __  / _ \
@@ -9,9 +7,11 @@ pre..
 
 HTTP delight.
 
-p. Fluent API for comfortable HTTP interactions. Marmalade offers a simple yet complete toolkit to ease the building of powerful REST clients.
+
+Fluent API for comfortable HTTP interactions. Marmalade offers a simple yet complete toolkit to ease the building of powerful REST clients.
 
 Provides:
+
 * Automatic serialization/deserialization by content type
 * Easy form handling, including multipart requests
 * Easy asynchronous HTTP interaction over NIO
@@ -19,7 +19,10 @@ Provides:
 * Convenient facilities for local multi-threaded and remote distributed executors
 * Pluggable mappers and services
 
+
+
+
 Enjoy!
 
-_be cool and play nice._
+be cool and play nice.
 
