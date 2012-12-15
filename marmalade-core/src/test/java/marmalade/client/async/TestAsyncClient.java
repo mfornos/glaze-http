@@ -95,9 +95,9 @@ public class TestAsyncClient extends BaseHttpTest
       DefaultAsyncClient client = new DefaultAsyncClient();
 
       ArrayList<Future<Member>> futures = new ArrayList<Future<Member>>();
-      for (int i = 0; i < 3; i++) {
+      //for (int i = 0; i < 3; i++) {
          futures.add(client.map(new HttpGet(baseUrl + "/"), Member.class));
-      }
+      //}
 
       for (Future<Member> m : futures) {
          Assert.assertEquals(m.get().id, "hello");

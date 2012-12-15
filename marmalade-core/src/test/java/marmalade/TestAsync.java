@@ -139,7 +139,7 @@ public class TestAsync extends BaseHttpTest
          Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
       }
 
-      Assert.assertEquals(callback.counter.get(), 5);
+      Assert.assertEquals(callback.counter.get(), 3);
 
    }
 
