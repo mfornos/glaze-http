@@ -1,5 +1,6 @@
 package marmalade;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,8 +13,10 @@ import java.util.concurrent.Future;
 import marmalade.client.async.AsyncClient;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.sync.SyncClient;
-import marmalade.client.tasks.ExecRequest;
-import marmalade.client.tasks.MapRequest;
+import marmalade.client.wire.tasks.CallableRequest.SerializableResponseCallback;
+import marmalade.client.wire.tasks.MapCall;
+import marmalade.client.wire.tasks.SendCall;
+import marmalade.client.wire.tasks.SerializableResponse;
 import marmalade.func.Closures.Closure;
 import marmalade.spi.Registry;
 import marmalade.util.EntityMapper;
@@ -615,43 +618,41 @@ public final class Marmalade
    }
 
    /**
-    * @return a request suitable to be submitted by an ExecutorService instance
-    */
-   public ExecRequest buildExecRequest()
-   {
-      return buildExecRequest(defaultSyncClient());
-   }
-
-   /**
-    * @param client
-    *           The execution client
-    * @return a request suitable to be submitted by an ExecutorService instance
-    */
-   public ExecRequest buildExecRequest(SyncClient client)
-   {
-      return new ExecRequest(client, build());
-   }
-
-   /**
     * @param type
     *           The deserialization type
-    * @return a request suitable to be submitted by an ExecutorService instance
+    * @return a request suitable for remote execution
     */
-   public <T> MapRequest<T> buildMapRequest(Class<T> type)
+   public <T extends Serializable> MapCall<T> buildMapCall(Class<T> type)
    {
-      return buildMapRequest(defaultSyncClient(), type);
+      return new MapCall<T>(build(), type);
    }
 
    /**
-    * @param client
-    *           The execution client
+    * @param callback
     * @param type
     *           The deserialization type
-    * @return a request suitable to be submitted by an ExecutorService instance
+    * @return a request suitable for remote execution
     */
-   public <T> MapRequest<T> buildMapRequest(SyncClient client, Class<T> type)
+   public <T extends Serializable> MapCall<T> buildMapCall(SerializableResponseCallback<T> callback, Class<T> type)
    {
-      return new MapRequest<T>(client, build(), type);
+      return new MapCall<T>(build(), callback, type);
+   }
+
+   /**
+    * @return a request suitable for remote execution
+    */
+   public SendCall buildSendCall()
+   {
+      return new SendCall(build());
+   }
+
+   /**
+    * @param callback
+    * @return a request suitable for remote execution
+    */
+   public SendCall buildSendCall(SerializableResponseCallback<SerializableResponse> callback)
+   {
+      return new SendCall(build(), callback);
    }
 
    /**

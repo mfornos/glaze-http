@@ -56,14 +56,14 @@ public class TestBasic
       assertNotNull(Options("http://www.google.com").build());
       assertNotNull(Head("http://www.google.com").build());
       assertNotNull(Patch("http://www.google.com").build());
-      assertNotNull(Delete("http://www.google.com").buildExecRequest());
-      assertNotNull(Patch("http://www.google.com").buildMapRequest(String.class));
+      assertNotNull(Delete("http://www.google.com").buildSendCall());
+      assertNotNull(Patch("http://www.google.com").buildMapCall(String.class));
       assertNotNull(Trace(uri).build());
       assertNotNull(Options(uri).build());
       assertNotNull(Head(uri).build());
       assertNotNull(Patch(uri).build());
-      assertNotNull(Delete(uri).buildExecRequest());
-      assertNotNull(Patch(uri).buildMapRequest(String.class));
+      assertNotNull(Delete(uri).buildSendCall());
+      assertNotNull(Patch(uri).buildMapCall(String.class));
    }
 
    @Test

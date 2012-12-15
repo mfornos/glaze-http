@@ -1,16 +1,14 @@
-package marmalade;
+package marmalade.client.wire.tasks;
 
 import static marmalade.Marmalade.Get;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +18,7 @@ import java.util.concurrent.TimeoutException;
 
 import marmalade.client.Response;
 import marmalade.client.sync.SyncClient;
+import marmalade.client.wire.tasks.CallableRequest;
 import marmalade.test.data.Member;
 
 import org.apache.http.HttpResponse;
@@ -28,16 +27,11 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicStatusLine;
-import org.apache.http.protocol.HttpContext;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class TestMultithreading
 {
 
-   private SyncClient client;
-
-   @SuppressWarnings("unchecked")
    @Test
    public void call() throws InterruptedException, ExecutionException, TimeoutException
    {
@@ -47,7 +41,7 @@ public class TestMultithreading
       ExecutorService executor = Executors.newCachedThreadPool();
 
       for (String uri : uris) {
-         Callable<Member> call = Get(uri).buildMapRequest(client, Member.class);
+         CallableRequest<Member> call = wrap(Get(uri).buildMapCall(Member.class));
          Future<Member> future = executor.submit(call);
          futures.add(future);
       }
@@ -59,7 +53,6 @@ public class TestMultithreading
          assertEquals(member.id, "abcdefg");
       }
 
-      verify(client, times(2)).map(any(HttpUriRequest.class), any(HttpContext.class), any(Class.class));
    }
 
    @Test
@@ -69,24 +62,44 @@ public class TestMultithreading
 
       ExecutorService executor = Executors.newCachedThreadPool();
       for (String uri : uris) {
-         executor.execute(Get(uri).buildExecRequest(client));
+         executor.submit(wrap(Get(uri).buildSendCall()));
       }
 
       executor.shutdown();
       executor.awaitTermination(1, TimeUnit.MINUTES);
 
-      verify(client, times(3)).execute(any(HttpUriRequest.class), any(HttpContext.class));
    }
 
-   @BeforeTest
-   @SuppressWarnings("unchecked")
-   public void setUp()
+   private class ExecWrapper<T extends Serializable> extends CallableRequest<T>
    {
-      client = mock(SyncClient.class);
-      HttpResponse response = mock(HttpResponse.class);
-      when(response.getEntity()).thenReturn(new StringEntity("hello", ContentType.DEFAULT_TEXT));
-      when(response.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
-      when(client.map(any(HttpUriRequest.class), any(HttpContext.class), any(Class.class))).thenReturn(new Member("abcdefg"));
-      when(client.execute(any(HttpUriRequest.class), any(HttpContext.class))).thenReturn(new Response(response));
+
+      private static final long serialVersionUID = 1L;
+      private CallableRequest<T> wrapped;
+
+      public ExecWrapper(CallableRequest<T> req)
+      {
+         super(req.getHttpRequest().materialize(), req.getCallback());
+         this.wrapped = req;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      protected T execute(SyncClient skip, HttpUriRequest request)
+      {
+         SyncClient client = mock(SyncClient.class);
+         HttpResponse response = mock(HttpResponse.class);
+         when(response.getEntity()).thenReturn(new StringEntity("hello", ContentType.DEFAULT_TEXT));
+         when(response.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
+         when(client.map(any(HttpUriRequest.class), any(Class.class))).thenReturn(new Member("abcdefg"));
+         when(client.execute(any(HttpUriRequest.class))).thenReturn(new Response(response));
+         return wrapped.execute(client, request);
+      }
+
    }
+
+   private <T extends Serializable> CallableRequest<T> wrap(CallableRequest<T> request)
+   {
+      return new ExecWrapper<T>(request);
+   }
+
 }

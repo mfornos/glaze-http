@@ -1,4 +1,4 @@
-package marmalade.client.wire;
+package marmalade.client.wire.tasks;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,19 +28,19 @@ import com.google.common.collect.ListMultimap;
  * Convenience class for HttpRequest serialization.
  * 
  */
-public class RequestTransfer implements Serializable
+public class SerializableRequest implements Serializable
 {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(RequestTransfer.class);
+   private static final Logger LOGGER = LoggerFactory.getLogger(SerializableRequest.class);
 
    private static final long serialVersionUID = 8168045456490905320L;
 
-   public static RequestTransfer from(HttpRequestBase request)
+   public static SerializableRequest from(HttpRequestBase request)
    {
-      return new RequestTransfer(request);
+      return new SerializableRequest(request);
    }
 
-   public static RequestTransfer from(HttpUriRequest req)
+   public static SerializableRequest from(HttpUriRequest req)
    {
       return from((HttpRequestBase) req);
    }
@@ -59,7 +59,7 @@ public class RequestTransfer implements Serializable
 
    private String entityEncoding;
 
-   public RequestTransfer(HttpRequestBase request)
+   public SerializableRequest(HttpRequestBase request)
    {
       this.uri = request.getURI();
       this.method = request.getRequestLine().getMethod();

@@ -1,4 +1,4 @@
-package marmalade;
+package marmalade.client.wire.tasks;
 
 import static marmalade.test.http.Condition.when;
 import static marmalade.test.http.Expressions.any;
@@ -10,9 +10,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import marmalade.Marmalade;
 import marmalade.client.Response;
 import marmalade.client.sync.DefaultSyncClient;
-import marmalade.client.wire.RequestTransfer;
+import marmalade.client.wire.tasks.SerializableRequest;
 import marmalade.test.http.BaseHttpTest;
 
 import org.apache.http.HttpEntity;
@@ -60,7 +61,7 @@ public class TestSerialization extends BaseHttpTest
    private HttpRequestBase serdeser(HttpUriRequest req) throws FileNotFoundException, IOException,
          ClassNotFoundException
    {
-      RequestTransfer ser = RequestTransfer.from(req);
+      SerializableRequest ser = SerializableRequest.from(req);
 
       // write
 
@@ -74,7 +75,7 @@ public class TestSerialization extends BaseHttpTest
 
       FileInputStream fin = new FileInputStream(serfile);
       ObjectInputStream sin = new ObjectInputStream(fin);
-      RequestTransfer deser = (RequestTransfer) sin.readObject();
+      SerializableRequest deser = (SerializableRequest) sin.readObject();
 
       return deser.materialize();
    }
