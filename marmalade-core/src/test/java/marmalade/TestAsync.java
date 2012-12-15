@@ -104,16 +104,20 @@ public class TestAsync extends BaseHttpTest
 
       AsyncClient client = new DefaultAsyncClient();
 
-      List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
+      try {
+         List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
 
-      futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync());
-      futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(new BasicHttpContext()));
-      futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client, new BasicHttpContext()));
-      futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client));
-      futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync());
+         futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync());
+         futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(new BasicHttpContext()));
+         futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client, new BasicHttpContext()));
+         futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client));
+         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync());
 
-      for (Future<HttpResponse> resp : futures) {
-         Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         for (Future<HttpResponse> resp : futures) {
+            Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         }
+      } finally {
+         client.shutdown();
       }
 
    }
@@ -124,20 +128,23 @@ public class TestAsync extends BaseHttpTest
       server.expect(when(any()).path("/areq").respond("OK"));
 
       AsyncClient client = new DefaultAsyncClient();
+      try {
+         List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
 
-      List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
+         CounterCallback<HttpResponse> callback = new CounterCallback<HttpResponse>();
 
-      CounterCallback<HttpResponse> callback = new CounterCallback<HttpResponse>();
+         futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(new BasicHttpContext(), callback));
+         futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client, new BasicHttpContext(), callback));
+         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(callback));
 
-      futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(new BasicHttpContext(), callback));
-      futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client, new BasicHttpContext(), callback));
-      futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(callback));
+         for (Future<HttpResponse> resp : futures) {
+            Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         }
 
-      for (Future<HttpResponse> resp : futures) {
-         Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         Assert.assertEquals(callback.counter.get(), 3);
+      } finally {
+         client.shutdown();
       }
-
-      Assert.assertEquals(callback.counter.get(), 3);
 
    }
 

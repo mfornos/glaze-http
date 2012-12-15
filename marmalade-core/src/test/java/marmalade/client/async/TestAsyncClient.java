@@ -101,10 +101,14 @@ public class TestAsyncClient extends BaseHttpTest
       server.expect(Condition.when("GET").respond("{\"id\":\"streaming\"}", ContentType.APPLICATION_JSON));
 
       AsyncClient client = new DefaultAsyncClient();
-      for (int i = 0; i < 10; i++) {
-         Future<HttpResponse> future1 = client.execute(new HttpGet(baseUrl + "/"));
-         Assert.assertEquals(future1.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
-         client.reset();
+      try {
+         for (int i = 0; i < 10; i++) {
+            Future<HttpResponse> future1 = client.execute(new HttpGet(baseUrl + "/"));
+            Assert.assertEquals(future1.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+            client.reset();
+         }
+      } finally {
+         client.shutdown();
       }
    }
 

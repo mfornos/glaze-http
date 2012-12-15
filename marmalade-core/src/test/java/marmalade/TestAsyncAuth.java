@@ -29,11 +29,15 @@ public class TestAsyncAuth extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
       client.auth(new UsernamePasswordCredentials("hello", "world"));
 
-      Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/basic").sendAsync(client);
+      try {
+         Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/basic").sendAsync(client);
 
-      Response response = new Response(fr.get());
-      Assert.assertEquals(response.status(), 200);
-      Assert.assertEquals(response.asString(), "yellow");
+         Response response = new Response(fr.get());
+         Assert.assertEquals(response.status(), 200);
+         Assert.assertEquals(response.asString(), "yellow");
+      } finally {
+         client.shutdown();
+      }
    }
 
    @Test
@@ -44,11 +48,15 @@ public class TestAsyncAuth extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
       client.auth(new UsernamePasswordCredentials("hello", "world"));
 
-      Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/digest").sendAsync(client);
+      try {
+         Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/digest").sendAsync(client);
 
-      Response response = new Response(fr.get());
-      Assert.assertEquals(response.status(), 200);
-      Assert.assertEquals(response.asString(), "yellow");
+         Response response = new Response(fr.get());
+         Assert.assertEquals(response.status(), 200);
+         Assert.assertEquals(response.asString(), "yellow");
+      } finally {
+         client.shutdown();
+      }
    }
 
    private void challengeFlow(String path, String challenge, String answer)
