@@ -2,7 +2,6 @@ package marmalade.client.async;
 
 import java.io.IOException;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -89,25 +88,16 @@ public class TestAsyncClient extends BaseHttpTest
    @Test
    public void map() throws InterruptedException, ExecutionException
    {
-
       server.expect(Condition.when("GET").respond("{\"id\":\"hello\"}", ContentType.APPLICATION_JSON));
 
       DefaultAsyncClient client = new DefaultAsyncClient();
 
-      ArrayList<Future<Member>> futures = new ArrayList<Future<Member>>();
-      //for (int i = 0; i < 3; i++) {
-         futures.add(client.map(new HttpGet(baseUrl + "/"), Member.class));
-      //}
-
-      for (Future<Member> m : futures) {
-         Assert.assertEquals(m.get().id, "hello");
-      }
+      Assert.assertEquals(client.map(new HttpGet(baseUrl + "/"), Member.class).get().id, "hello");
    }
 
    @Test
    public void resetTest() throws InterruptedException, ExecutionException, ParseException, IOException
    {
-
       server.expect(Condition.when("GET").respond("{\"id\":\"streaming\"}", ContentType.APPLICATION_JSON));
 
       AsyncClient client = new DefaultAsyncClient();

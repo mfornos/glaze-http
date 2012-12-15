@@ -129,8 +129,6 @@ public class TestAsync extends BaseHttpTest
 
       CounterCallback<HttpResponse> callback = new CounterCallback<HttpResponse>();
 
-//      futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(callback));
-//      futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(client, callback));
       futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(new BasicHttpContext(), callback));
       futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client, new BasicHttpContext(), callback));
       futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(callback));
