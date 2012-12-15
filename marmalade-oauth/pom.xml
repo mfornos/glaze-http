@@ -5,6 +5,8 @@
     <groupId>com.github.mfornos</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
+  <name>Marmalade - OAuth</name>
   <groupId>com.github.mfornos</groupId>
   <artifactId>marmalade-oauth</artifactId>
   <packaging>jar</packaging>
@@ -53,9 +55,8 @@
     </dependency>
     <dependency>
       <groupId>com.github.mfornos</groupId>
-      <artifactId>marmalade-core</artifactId>
+      <artifactId>marmalade-test</artifactId>
       <version>${project.version}</version>
-      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>

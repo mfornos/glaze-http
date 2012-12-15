@@ -5,6 +5,8 @@
     <artifactId>marmalade</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
+  <name>Marmalade - Core</name>
   <groupId>com.github.mfornos</groupId>
   <artifactId>marmalade-core</artifactId>
   <packaging>jar</packaging>
@@ -13,8 +15,6 @@
     <jackson.version>2.1.1</jackson.version>
     <httpasync.version>4.0-beta3</httpasync.version>
     <guava.version>13.0.1</guava.version>
-    
-    <simple.version>4.1.21</simple.version>
   </properties>
   
   <dependencies>
@@ -44,9 +44,9 @@
       <version>${guava.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.simpleframework</groupId>
-      <artifactId>simple</artifactId>
-      <version>${simple.version}</version>
+      <groupId>com.github.mfornos</groupId>
+      <artifactId>marmalade-test</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
