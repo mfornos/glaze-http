@@ -7,6 +7,7 @@ import marmalade.MarmaladeException;
 import marmalade.func.Closures.ResponseClosure;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -73,6 +74,17 @@ public class Response
    public boolean isNotError()
    {
       return !isError();
+   }
+
+   public boolean isOk()
+   {
+      return getStatus() == HttpStatus.SC_OK;
+   }
+
+   @Override
+   public String toString()
+   {
+      return "Response [wrapped=" + wrapped + "]";
    }
 
    public <T> T with(ResponseClosure<T, Response> closure)

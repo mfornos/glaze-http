@@ -169,9 +169,12 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    {
       return execute(request, new MapperResponseHandler<T>(type));
    }
-   
-   /* (non-Javadoc)
-    * @see marmalade.client.sync.SyncClient#map(org.apache.http.client.methods.HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see marmalade.client.sync.SyncClient#map(org.apache.http.client.methods.
+    * HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
     */
    @Override
    public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)

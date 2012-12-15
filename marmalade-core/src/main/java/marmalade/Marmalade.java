@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.Future;
 
-import marmalade.client.Response;
 import marmalade.client.async.AsyncClient;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.sync.SyncClient;
@@ -30,6 +29,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -84,7 +84,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * 
  * // Map with error handling
  * 
- * MyBean out = Get(uri).with(myErrorHandler).map(MyBean.class);
+ * MyBean out = Get(uri).withErrorHandler(new ErrorHandler(){...}).map(MyBean.class);
  * 
  * // Post a bean as url-encoded content
  * 
@@ -496,6 +496,8 @@ public final class Marmalade
    private HttpEntity entity;
 
    private ErrorHandler errorHandler;
+
+   private ResponseHandler<?> responseHandler;
 
    private Closure<HttpRequestBase> requestClosure;
 
@@ -1030,7 +1032,7 @@ public final class Marmalade
     * 
     * @return the response
     */
-   public Response send()
+   public <T> T send()
    {
       return send(defaultSyncClient());
    }
@@ -1042,7 +1044,7 @@ public final class Marmalade
     *           the HTTP context
     * @return the response
     */
-   public Response send(HttpContext context)
+   public <T> T send(HttpContext context)
    {
       return send(defaultSyncClient(), context);
    }
@@ -1054,9 +1056,10 @@ public final class Marmalade
     *           The execution client.
     * @return the response
     */
-   public Response send(SyncClient client)
+   @SuppressWarnings("unchecked")
+   public <T> T send(SyncClient client)
    {
-      return client.execute(build());
+      return (T) (responseHandler == null ? client.execute(build()) : client.execute(request, responseHandler));
    }
 
    /**
@@ -1068,9 +1071,11 @@ public final class Marmalade
     *           The HTTP context.
     * @return the response
     */
-   public Response send(SyncClient client, HttpContext context)
+   @SuppressWarnings("unchecked")
+   public <T> T send(SyncClient client, HttpContext context)
    {
-      return client.execute(build(), context);
+      return (T) (responseHandler == null ? client.execute(build(), context)
+            : client.execute(request, responseHandler, context));
    }
 
    /**
@@ -1398,9 +1403,23 @@ public final class Marmalade
     * @return builder instance
     * @see ErrorHandler
     */
-   public Marmalade with(ErrorHandler errorHandler)
+   public Marmalade withErrorHandler(ErrorHandler errorHandler)
    {
       this.errorHandler = errorHandler;
+      return this;
+   }
+
+   /**
+    * Sets a response handler for the current request.
+    * 
+    * @param responseHandler
+    *           The ResponseHandler
+    * @return builder instance
+    * @see ResponseHandler
+    */
+   public Marmalade withHandler(ResponseHandler<?> responseHandler)
+   {
+      this.responseHandler = responseHandler;
       return this;
    }
 

@@ -2,6 +2,7 @@ package marmalade.oauth;
 
 import static marmalade.Marmalade.Get;
 import static marmalade.test.http.Expressions.regex;
+import marmalade.client.Response;
 import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
 
@@ -20,7 +21,8 @@ public class TestOAuth extends BaseHttpTest
       String answer = ".*oauth_signature=\".*\".*oauth_signature_method=\"HMAC-SHA1\",.*";
       server.expect(Condition.when("GET").path("/").header(HttpHeaders.AUTHORIZATION, regex(answer)).respond("yellow", ContentType.DEFAULT_TEXT));
 
-      Assert.assertEquals(Get(baseUrl + "/").send().getStatus(), HttpStatus.SC_OK);
+      Response response = Get(baseUrl + "/").send();
+      Assert.assertEquals(response.getStatus(), HttpStatus.SC_OK);
    }
 
 }
