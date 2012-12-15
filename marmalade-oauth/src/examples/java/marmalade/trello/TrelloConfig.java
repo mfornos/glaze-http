@@ -1,4 +1,4 @@
-package marmalade.test;
+package marmalade.trello;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,7 +10,7 @@ public class TrelloConfig
    static Properties props = new Properties();
    static {
       try {
-         props.load(new FileReader("src/test/resources/trello.properties"));
+         props.load(new FileReader("src/examples/resources/trello.properties"));
       } catch (FileNotFoundException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();

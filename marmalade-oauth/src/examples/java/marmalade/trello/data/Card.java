@@ -1,4 +1,4 @@
-package marmalade.data;
+package marmalade.trello.data;
 
 public class Card
 {

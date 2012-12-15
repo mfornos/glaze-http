@@ -1,10 +1,10 @@
-package marmalade.oauth;
+package marmalade.trello;
 
 import marmalade.Marmalade;
 import marmalade.client.Response;
 import marmalade.client.interceptors.DebugInterceptor;
 import marmalade.client.sync.SyncClient;
-import marmalade.data.Card;
+import marmalade.trello.data.Card;
 import marmalade.spi.Registry;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;

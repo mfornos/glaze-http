@@ -1,4 +1,4 @@
-package marmalade.test;
+package marmalade.trello;
 
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import marmalade.oauth.OAuthCredentials;
@@ -10,8 +10,8 @@ public class FixedCredentialsProvider extends DefaultCredentialsProvider
    @Override
    protected OAuthCredentials getOAuthCredentials()
    {
-      CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer("keyone", "secretone");
-      consumer.setTokenWithSecret("abcdefg", "secret");
+      CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(TrelloConfig.getKey(), TrelloConfig.getSecret());
+      consumer.setTokenWithSecret(TrelloConfig.getTokenKey(), TrelloConfig.getTokenSecret());
 
       return new OAuthCredentials(consumer);
    }

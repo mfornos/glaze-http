@@ -1,11 +1,10 @@
-package marmalade.oauth;
+package marmalade.trello;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import marmalade.test.TrelloConfig;
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
