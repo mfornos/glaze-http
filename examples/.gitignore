@@ -1,6 +1,7 @@
 /target
 /test-output
 .project
+.project.swp
 .classpath
 .settings
 .codepro
