@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class TestRequest extends BaseHttpTest
 {
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void test()
    {
       server.expect(when(any()).path("/reqtest").respond("OK"));

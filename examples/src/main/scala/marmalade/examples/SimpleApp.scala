@@ -9,19 +9,20 @@ import scala.collection.mutable
 import org.apache.http.HttpResponse
 import marmalade.client.Response
 import marmalade.client.handlers.ErrorHandler
+import marmalade.scala.MarmaladeHelpers
 
-object SimpleApp extends AnyRef with MarmaladeHelpers {
+object SimpleApp extends MarmaladeHelpers {
 
   val googleKey = "YOUR GOOGLE KEY";
 
   def main(args: Array[String]): Unit = {
 
     // Register scala module
-    Registry.lookupMapper(ContentType.APPLICATION_JSON).registerModule(DefaultScalaModule);
+    Registry.lookupMapper(ContentType.APPLICATION_JSON).registerModule(DefaultScalaModule)
 
     // JSON results from Freebase
     //
-
+    
     val uri = uriBuilderFrom("https://www.googleapis.com/freebase/v1/mqlread").addParameter("query", "{\"id\":\"/en/google\",\"name\":null}").addParameter("key", googleKey).build
     val result = Get(uri).withErrorHandler((e: HttpResponse) => println("Error: %s".format(e))).map(typeRef[Map[String, String]]);
     println("Freebase result: %s".format(result("result")))

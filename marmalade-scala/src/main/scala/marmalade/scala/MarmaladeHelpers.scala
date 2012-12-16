@@ -1,4 +1,4 @@
-package marmalade.examples
+package marmalade.scala
 
 import com.fasterxml.jackson.core.`type`.TypeReference
 import java.lang.reflect.Type

@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 
 public class TestErrors extends BaseHttpTest
 {
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void simple()
    {
       server.expect(Condition.when("GET").respond(HttpStatus.SC_FORBIDDEN));
@@ -39,7 +39,7 @@ public class TestErrors extends BaseHttpTest
 
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void customHandler()
    {
       server.expect(Condition.when("GET").respond(HttpStatus.SC_FORBIDDEN));
@@ -56,7 +56,7 @@ public class TestErrors extends BaseHttpTest
       Assert.assertNull(out);
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void customHandlerSend()
    {
       server.expect(Condition.when("GET").respond(HttpStatus.SC_FORBIDDEN));

@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 public class TestMapping extends BaseHttpTest
 {
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void postJson()
    {
       server.expect(Condition.when("POST").respond("{\"id\":\"ABCDEFG\"}", ContentType.APPLICATION_JSON));
@@ -36,7 +36,7 @@ public class TestMapping extends BaseHttpTest
       Assert.assertEquals(out.id, "ABCDEFG");
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void postJsonBackXml()
    {
       server.expect(Condition.when("POST").respond("<xml><id>ABCDEFG</id></xml>", ContentType.APPLICATION_XML));
@@ -50,7 +50,7 @@ public class TestMapping extends BaseHttpTest
       Assert.assertEquals(out.id, "ABCDEFG");
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void postJsonForceBackXml()
    {
       server.expect(Condition.when("POST").respond("<xml><id>ABCDEFG</id></xml>", ContentType.APPLICATION_OCTET_STREAM));
@@ -63,7 +63,7 @@ public class TestMapping extends BaseHttpTest
       Assert.assertEquals(out.id, "ABCDEFG");
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void postUrlEncoded() throws ParseException, IOException
    {
       server.expect(Condition.when("POST").respond("{\"id\":\"ABCDEFG\"}", ContentType.APPLICATION_JSON));

@@ -10,7 +10,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.mfornos</groupId>
-			<artifactId>marmalade-core</artifactId>
+			<artifactId>marmalade-scala</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

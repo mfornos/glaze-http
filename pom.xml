@@ -78,6 +78,7 @@
   	<module>marmalade-core</module>
   	<module>marmalade-oauth</module>
   	<module>marmalade-test</module>
+  	<module>marmalade-scala</module>
   </modules>
   
   <build>

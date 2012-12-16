@@ -55,7 +55,7 @@ public class TestAsyncClient extends BaseHttpTest
 
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void basic() throws InterruptedException, ExecutionException, ParseException, IOException
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"streaming\"}", ContentType.APPLICATION_JSON));
@@ -69,7 +69,7 @@ public class TestAsyncClient extends BaseHttpTest
       }
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void basicLoop() throws InterruptedException, ExecutionException, ParseException, IOException
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"streaming\"}", ContentType.APPLICATION_JSON));
@@ -85,7 +85,7 @@ public class TestAsyncClient extends BaseHttpTest
       }
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void map() throws InterruptedException, ExecutionException
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"hello\"}", ContentType.APPLICATION_JSON));
@@ -98,7 +98,7 @@ public class TestAsyncClient extends BaseHttpTest
       }
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void resetTest() throws InterruptedException, ExecutionException, ParseException, IOException
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"streaming\"}", ContentType.APPLICATION_JSON));
@@ -115,7 +115,7 @@ public class TestAsyncClient extends BaseHttpTest
       }
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void streaming() throws InterruptedException, ExecutionException, IOReactorException
    {
       server.expect(Condition.when("POST").respond("{\"id\":\"hello\"}", ContentType.APPLICATION_JSON));

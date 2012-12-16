@@ -25,7 +25,7 @@ public class TestClient extends BaseHttpTest
       client.shutdown();
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void execute()
    {
       server.expect(Condition.when("POST").respond("{\"id\":\"hi\"}", ContentType.APPLICATION_JSON));
@@ -40,7 +40,7 @@ public class TestClient extends BaseHttpTest
       Assert.assertTrue(response.isNotError());
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void map()
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"abcd\"}", ContentType.APPLICATION_JSON));

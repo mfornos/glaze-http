@@ -48,7 +48,7 @@ import org.testng.annotations.Test;
 public class TestBasic
 {
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void methods() throws URISyntaxException
    {
       URI uri = new URI("http://localhost");
@@ -66,7 +66,7 @@ public class TestBasic
       assertNotNull(Patch(uri).buildMapCall(String.class));
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void otherEntityBuilds() throws UnsupportedEncodingException
    {
       assertNotNull(Get("http://localhost").entity(new StringEntity("blah")).build());
@@ -74,7 +74,7 @@ public class TestBasic
       assertNotNull(Post("http://localhost").bean("blah").as(null).build());
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void postMappings() throws ParseException, IOException
    {
       URI uri = UriBuilder.uriBuilderFrom("https://api.google.com/card").build();
@@ -95,7 +95,7 @@ public class TestBasic
       assertEquals(EntityUtils.toString(post.getEntity()), "name=Hello+wiz&desc=xxx+xxx&idList=4e77e2920441f7000045755f");
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void putMappings() throws ParseException, IOException
    {
       URI uri = UriBuilder.uriBuilderFrom("https://api.google.com/card").build();
@@ -116,7 +116,7 @@ public class TestBasic
       assertEquals(EntityUtils.toString(put.getEntity()), "name=Hello+wiz&desc=xxx+xxx&idList=4e77e2920441f7000045755f");
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void requestParameters()
    {
       HttpHost proxy = new HttpHost("localhost");
@@ -160,7 +160,7 @@ public class TestBasic
       assertEquals(request.getHeaders("a").length, 2);
    }
 
-   @Test(timeOut = 1000)
+   @Test(timeOut = 5000)
    public void withClosure()
    {
       HttpUriRequest request = Get("http://127.0.0.1").decorate(new Closure<HttpRequestBase>()
