@@ -285,4 +285,18 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       httpClient.getConnectionManager().getSchemeRegistry().unregister(name);
    }
 
+   @Override
+   public Response execute(HttpUriRequest request, ErrorHandler errorHandler)
+   {
+      return execute(request, errorHandler, prepareLocalContext());
+   }
+
+   @Override
+   public Response execute(HttpUriRequest request, ErrorHandler errorHandler, HttpContext context)
+   {
+      return errorHandler == null ? execute(request, context)
+            : execute(request, new DefaultResponseHandler(errorHandler), context);
+
+   }
+
 }

@@ -31,6 +31,10 @@ public interface SyncClient extends Client
     */
    Response execute(HttpUriRequest request);
 
+   Response execute(HttpUriRequest build, ErrorHandler errorHandler);
+
+   Response execute(HttpUriRequest build, ErrorHandler errorHandler, HttpContext context);
+
    /**
     * Executes the request. Please, note that response content must be processed
     * or discarded using {@link Response#discardContent()}, otherwise the
@@ -78,6 +82,8 @@ public interface SyncClient extends Client
     */
    <T> T map(HttpUriRequest request, Class<T> type, ContentType forceType);
 
+   <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler);
+
    /**
     * @param request
     * @param context
@@ -123,7 +129,5 @@ public interface SyncClient extends Client
     *           The scheme name
     */
    void unregisterScheme(final String name);
-
-   <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler);
 
 }

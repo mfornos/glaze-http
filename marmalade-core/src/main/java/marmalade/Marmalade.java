@@ -1060,7 +1060,8 @@ public final class Marmalade
    @SuppressWarnings("unchecked")
    public <T> T send(SyncClient client)
    {
-      return (T) (responseHandler == null ? client.execute(build()) : client.execute(request, responseHandler));
+      return (T) (responseHandler == null ? client.execute(build(), errorHandler)
+            : client.execute(request, responseHandler));
    }
 
    /**
@@ -1075,7 +1076,7 @@ public final class Marmalade
    @SuppressWarnings("unchecked")
    public <T> T send(SyncClient client, HttpContext context)
    {
-      return (T) (responseHandler == null ? client.execute(build(), context)
+      return (T) (responseHandler == null ? client.execute(build(), errorHandler, context)
             : client.execute(request, responseHandler, context));
    }
 
