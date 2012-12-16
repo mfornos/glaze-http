@@ -63,7 +63,7 @@ public class TestAsync extends BaseHttpTest
       }
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void postJson() throws InterruptedException, ExecutionException
    {
       server.expect(Condition.when("POST").path("/scott").respond("{\"id\":\"scott\"}", ContentType.APPLICATION_JSON));
@@ -78,7 +78,7 @@ public class TestAsync extends BaseHttpTest
       Assert.assertEquals(tiger.get().id, "tiger");
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void postJsonCallback() throws InterruptedException, ExecutionException
    {
       server.expect(Condition.when("POST").path("/scott").respond("{\"id\":\"scott\"}", ContentType.APPLICATION_JSON));
@@ -97,7 +97,7 @@ public class TestAsync extends BaseHttpTest
       Assert.assertEquals(callback.counter.get(), 2);
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void send() throws InterruptedException, ExecutionException
    {
       server.expect(when(any()).path("/areq").respond("OK"));
@@ -122,7 +122,7 @@ public class TestAsync extends BaseHttpTest
 
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void sendCallback() throws InterruptedException, ExecutionException
    {
       server.expect(when(any()).path("/areq").respond("OK"));
@@ -148,7 +148,7 @@ public class TestAsync extends BaseHttpTest
 
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void stream() throws InterruptedException, ExecutionException
    {
       server.expect(Condition.when("GET").path("/stream").respond("Michael bytes", ContentType.APPLICATION_JSON));

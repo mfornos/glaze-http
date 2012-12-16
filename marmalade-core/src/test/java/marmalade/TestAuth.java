@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 public class TestAuth extends BaseHttpTest
 {
 
-   @Test
+   @Test(timeOut = 1000)
    public void clientAuthBasic()
    {
       challengeFlow("/auth/basic", "Basic realm=\"Test Realm\"", "Basic aGVsbG86d29ybGQ=");
@@ -33,7 +33,7 @@ public class TestAuth extends BaseHttpTest
       Assert.assertEquals(response.asString(), "yellow");
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void clientAuthDigest()
    {
       challengeFlow("/auth/digest", "Digest algorithm=MD5,realm=\"Test Realm\",nonce=\"cafe3333\"", "Digest username=\"hello\", realm=\"Test Realm\", nonce=\"cafe3333\", uri=\"/auth/digest\", response=\"29fc4c354e7d43317f2c977f15be3849\", algorithm=\"MD5\"");
@@ -47,7 +47,7 @@ public class TestAuth extends BaseHttpTest
       Assert.assertEquals(response.asString(), "yellow");
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void perRequestPreemptive()
    {
       HttpUriRequest request = Marmalade.Get("http://localhost").auth("hello", "world").build();

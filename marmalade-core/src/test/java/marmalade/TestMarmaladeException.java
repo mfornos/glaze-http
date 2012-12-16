@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 public class TestMarmaladeException
 {
-   @Test
+   @Test(timeOut = 1000)
    public void test()
    {
       Throwable cause = new Throwable();

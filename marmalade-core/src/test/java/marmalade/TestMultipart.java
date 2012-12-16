@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 
 public class TestMultipart
 {
-   @Test
+   @Test(timeOut = 1000)
    public void multipartSimple() throws FileNotFoundException
    {
       File file = new File("src/test/resources/files/keiller.jpg");
@@ -47,7 +47,7 @@ public class TestMultipart
       assertTrue(entity.getContentType().getValue().startsWith("multipart/form-data; boundary="));
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void multipartUnmanaged()
    {
       File file = new File("src/test/resources/files/keiller.jpg");
@@ -61,7 +61,7 @@ public class TestMultipart
       assertEquals((MultipartEntity) post.getEntity(), entity);
    }
 
-   @Test
+   @Test(timeOut = 1000)
    public void multipartWithAnnotations() throws ParseException, IOException
    {
       Foo bar = new Foo();
