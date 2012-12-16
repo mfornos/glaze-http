@@ -130,12 +130,11 @@ public class TestAsync extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
       try {
          List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
-
          CounterCallback<HttpResponse> callback = new CounterCallback<HttpResponse>();
 
-         futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(new BasicHttpContext(), callback));
+         futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client, new BasicHttpContext(), callback));
          futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client, new BasicHttpContext(), callback));
-         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(callback));
+         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(client, callback));
 
          for (Future<HttpResponse> resp : futures) {
             Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
