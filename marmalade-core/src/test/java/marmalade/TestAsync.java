@@ -107,11 +107,11 @@ public class TestAsync extends BaseHttpTest
       try {
          List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
 
-         futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync());
-         futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(new BasicHttpContext()));
+         futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client));
+         futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(client, new BasicHttpContext()));
          futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client, new BasicHttpContext()));
          futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client));
-         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync());
+         futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(client));
 
          for (Future<HttpResponse> resp : futures) {
             Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
