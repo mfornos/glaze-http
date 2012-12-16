@@ -6,6 +6,7 @@ import java.util.Arrays;
 import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
 import marmalade.client.Response;
+import marmalade.client.handlers.DefaultResponseHandler;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.handlers.MapperResponseHandler;
 import marmalade.spi.Registry;
