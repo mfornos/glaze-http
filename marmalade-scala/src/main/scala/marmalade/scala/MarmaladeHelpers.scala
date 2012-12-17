@@ -5,23 +5,24 @@ import java.lang.reflect.Type
 import java.lang.reflect.ParameterizedType
 import org.apache.http.HttpResponse
 import marmalade.client.handlers.ErrorHandler
-
 import org.apache.http.client.ResponseHandler
+import marmalade.client.Response
+import marmalade.client.handlers.DefaultResponseHandler
 
 trait MarmaladeHelpers {
-  
-  class ErrorHandlerWrap(e: HttpResponse => Unit)
+
+  class ErrorHandlerWrap(e: Response => Unit)
     extends ErrorHandler {
-    def onError(error: HttpResponse) = e(error)
+    override def onError(error: Response) = e(error)
   }
-  
-  implicit def ErrorHandlerImplicit(r: HttpResponse => Unit) = new ErrorHandlerWrap(r)
+
+  implicit def ErrorHandlerImplicit(r: Response => Unit) = new ErrorHandlerWrap(r)
 
   class ResponseHandlerWrap[T](e: HttpResponse => T)
     extends ResponseHandler[T] {
-    def handleResponse(response: HttpResponse) = e(response)
+    override def handleResponse(response: HttpResponse) = e(response)
   }
-  
+
   implicit def ResponseHandlerImplicit[T](r: HttpResponse => T) = new ResponseHandlerWrap[T](r)
 
   def typeRef[T: Manifest] = new TypeReference[T] {
@@ -31,11 +32,11 @@ trait MarmaladeHelpers {
   private def typeFromManifest(m: Manifest[_]): Type = {
     if (m.typeArguments.isEmpty) { m.erasure }
     else new ParameterizedType {
-      def getRawType = m.erasure
+      override def getRawType = m.erasure
 
-      def getActualTypeArguments = m.typeArguments.map(typeFromManifest).toArray
+      override def getActualTypeArguments = m.typeArguments.map(typeFromManifest).toArray
 
-      def getOwnerType = null
+      override def getOwnerType = null
     }
   }
 

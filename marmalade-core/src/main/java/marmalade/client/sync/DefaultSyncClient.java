@@ -6,8 +6,8 @@ import java.util.Arrays;
 import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
 import marmalade.client.Response;
-import marmalade.client.handlers.DefaultResponseHandler;
 import marmalade.client.handlers.ErrorHandler;
+import marmalade.client.handlers.ErrorResponseHandler;
 import marmalade.client.handlers.MapperResponseHandler;
 import marmalade.spi.Registry;
 
@@ -95,6 +95,20 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       }
    }
 
+   @Override
+   public Response execute(HttpUriRequest request, ErrorHandler errorHandler)
+   {
+      return execute(request, errorHandler, prepareLocalContext());
+   }
+
+   @Override
+   public Response execute(HttpUriRequest request, ErrorHandler errorHandler, HttpContext context)
+   {
+      return errorHandler == null ? execute(request, context)
+            : execute(request, new ErrorResponseHandler(errorHandler), context);
+
+   }
+
    /*
     * (non-Javadoc)
     * 
@@ -174,18 +188,6 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    /*
     * (non-Javadoc)
     * 
-    * @see marmalade.client.sync.SyncClient#map(org.apache.http.client.methods.
-    * HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
-    */
-   @Override
-   public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
-   {
-      return execute(request, new MapperResponseHandler<T>(type, errorHandler));
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
     * @see
     * marmalade.client.SyncClient#map(org.apache.http.client.methods.HttpUriRequest
     * , java.lang.Class, org.apache.http.entity.ContentType)
@@ -194,6 +196,18 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    public <T> T map(HttpUriRequest request, Class<T> type, ContentType forceType)
    {
       return execute(request, new MapperResponseHandler<T>(type, forceType));
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see marmalade.client.sync.SyncClient#map(org.apache.http.client.methods.
+    * HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
+    */
+   @Override
+   public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   {
+      return execute(request, new MapperResponseHandler<T>(type, errorHandler));
    }
 
    /*
@@ -284,20 +298,6 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    public void unregisterScheme(final String name)
    {
       httpClient.getConnectionManager().getSchemeRegistry().unregister(name);
-   }
-
-   @Override
-   public Response execute(HttpUriRequest request, ErrorHandler errorHandler)
-   {
-      return execute(request, errorHandler, prepareLocalContext());
-   }
-
-   @Override
-   public Response execute(HttpUriRequest request, ErrorHandler errorHandler, HttpContext context)
-   {
-      return errorHandler == null ? execute(request, context)
-            : execute(request, new DefaultResponseHandler(errorHandler), context);
-
    }
 
 }

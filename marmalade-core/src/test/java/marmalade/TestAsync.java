@@ -71,11 +71,15 @@ public class TestAsync extends BaseHttpTest
 
       Card in = new Card("Hello", "world", "0989080");
 
-      Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class);
-      Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext());
+      try {
+         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class);
+         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext());
 
-      Assert.assertEquals(scott.get().id, "scott");
-      Assert.assertEquals(tiger.get().id, "tiger");
+         Assert.assertEquals(scott.get().id, "scott");
+         Assert.assertEquals(tiger.get().id, "tiger");
+      } finally {
+         EndAsync();
+      }
    }
 
    @Test(timeOut = 5000)
@@ -88,11 +92,15 @@ public class TestAsync extends BaseHttpTest
 
       Card in = new Card("Hello", "world", "0989080");
 
-      Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, callback);
-      Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), callback);
+      try {
+         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, callback);
+         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), callback);
 
-      Assert.assertEquals(scott.get().id, "scott");
-      Assert.assertEquals(tiger.get().id, "tiger");
+         Assert.assertEquals(scott.get().id, "scott");
+         Assert.assertEquals(tiger.get().id, "tiger");
+      } finally {
+         EndAsync();
+      }
 
       Assert.assertEquals(callback.counter.get(), 2);
    }
@@ -152,35 +160,39 @@ public class TestAsync extends BaseHttpTest
    {
       server.expect(Condition.when("GET").path("/stream").respond("Michael bytes", ContentType.APPLICATION_JSON));
 
-      Future<String> ok = Get(baseUrl + "/stream").stream(new AsyncByteConsumer<String>()
-      {
-         private String ok;
-
-         @Override
-         protected String buildResult(HttpContext ctx) throws Exception
+      try {
+         Future<String> ok = Get(baseUrl + "/stream").stream(new AsyncByteConsumer<String>()
          {
-            return ok;
-         }
+            private String ok;
 
-         @Override
-         protected void onByteReceived(ByteBuffer bytes, IOControl control) throws IOException
-         {
-            ok = "";
-            byte[] bb = bytes.array();
-            for (byte b : bb) {
-               if (b > 0)
-                  ok += (char) b;
+            @Override
+            protected String buildResult(HttpContext ctx) throws Exception
+            {
+               return ok;
             }
-         }
 
-         @Override
-         protected void onResponseReceived(HttpResponse response) throws HttpException, IOException
-         {
-            //
-         }
-      });
+            @Override
+            protected void onByteReceived(ByteBuffer bytes, IOControl control) throws IOException
+            {
+               ok = "";
+               byte[] bb = bytes.array();
+               for (byte b : bb) {
+                  if (b > 0)
+                     ok += (char) b;
+               }
+            }
 
-      Assert.assertEquals(ok.get(), "Michael bytes");
+            @Override
+            protected void onResponseReceived(HttpResponse response) throws HttpException, IOException
+            {
+               //
+            }
+         });
+
+         Assert.assertEquals(ok.get(), "Michael bytes");
+      } finally {
+         EndAsync();
+      }
 
    }
 

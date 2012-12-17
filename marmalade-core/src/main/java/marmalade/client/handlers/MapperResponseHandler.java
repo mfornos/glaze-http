@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import marmalade.MarmaladeException;
+import marmalade.client.Response;
 import marmalade.mime.MimeResolver;
 import marmalade.spi.Registry;
 
@@ -12,7 +13,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +68,15 @@ public class MapperResponseHandler<T> implements ResponseHandler<T>
       return statusLine.getStatusCode() >= 300 ? error(response) : ok(response);
    }
 
-   protected T error(HttpResponse response)
+   protected T error(HttpResponse httpResponse)
    {
-      LOGGER.error("Got error {}", response);
+      LOGGER.error("Got error {}", httpResponse);
 
+      Response response = new Response(httpResponse);
       try {
          errorHandler.onError(response);
       } finally {
-         EntityUtils.consumeQuietly(response.getEntity());
+         response.discardContent();
       }
 
       return null;

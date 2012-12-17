@@ -119,13 +119,25 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * 
  * // Basic send async
  * 
- * Future&lt;HttpResponse&gt; response = Get(uri).sendAsync();
- * response.get();
+ * try {
+ * 
+ *    Future&lt;HttpResponse&gt; response = Get(uri).sendAsync();
+ *    response.get();
+ * 
+ * } finally {
+ *    EndAsync();
+ * }
  * 
  * // Basic map async
  * 
- * Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
- * out.get();
+ * try {
+ * 
+ *    Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
+ *    out.get();
+ * 
+ * } finally {
+ *    EndAsync();
+ * }
  * 
  * </pre>
  * 
@@ -172,8 +184,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * 
  * <pre>
  * 
- * Future&lt;MyResult&gt; result = Get(uri).stream(myAsyncConsumer);
- * result.get();
+ * try {
+ * 
+ *    Future&lt;MyResult&gt; result = Get(uri).stream(myAsyncConsumer);
+ *    result.get();
+ * 
+ * } finally {
+ *    EndAsync();
+ * }
  * 
  * </pre>
  * 
@@ -216,6 +234,14 @@ public final class Marmalade
    public static Marmalade Delete(URI uri)
    {
       return new Marmalade(new HttpDelete(uri));
+   }
+
+   /**
+    * 
+    */
+   public static void EndAsync()
+   {
+      Registry.lookup(AsyncClient.class).reset();
    }
 
    /**
@@ -853,6 +879,21 @@ public final class Marmalade
    public <T> T map(SyncClient client, Class<T> type, HttpContext context, ContentType overrideType)
    {
       return client.map(build(), context, type, overrideType);
+   }
+
+   /**
+    * Maps the response to a type instance.
+    * 
+    * @param client
+    *           The execution client.
+    * @param type
+    *           The TypeReference to be mapped.
+    * @return an instance of the given type populated with response values.
+    * @see TypeReference
+    */
+   public <T> T map(SyncClient client, TypeReference<T> type)
+   {
+      return map(client, TypeHelper.resolveClass(type));
    }
 
    /**

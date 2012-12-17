@@ -1,6 +1,6 @@
 package marmalade.client.handlers;
 
-import org.apache.http.HttpResponse;
+import marmalade.client.Response;
 
 /**
  * Implementation of {@link ErrorHandler} that croaks
@@ -11,9 +11,8 @@ public class CroakErrorHandler implements ErrorHandler
 {
 
    @Override
-   public void onError(HttpResponse response)
+   public void onError(Response response)
    {
-      // TODO consume or copy request?
       throw new ErrorResponseException(response);
    }
 

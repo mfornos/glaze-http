@@ -8,6 +8,7 @@ import marmalade.func.Closures.ResponseClosure;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -25,6 +26,9 @@ public class Response
 
    public byte[] asBytes()
    {
+      if (isEmpty()) {
+         return null;
+      }
       try {
          return EntityUtils.toByteArray(this.wrapped.getEntity());
       } catch (IOException e) {
@@ -34,6 +38,9 @@ public class Response
 
    public InputStream asInputStream()
    {
+      if (isEmpty()) {
+         return null;
+      }
       try {
          return this.wrapped.getEntity().getContent();
       } catch (IOException e) {
@@ -43,6 +50,9 @@ public class Response
 
    public String asString()
    {
+      if (isEmpty()) {
+         return null;
+      }
       try {
          return EntityUtils.toString(this.wrapped.getEntity());
       } catch (IOException e) {
@@ -59,6 +69,11 @@ public class Response
    public HttpResponse getHttpResponse()
    {
       return wrapped;
+   }
+
+   public boolean isEmpty()
+   {
+      return wrapped.getEntity() == null;
    }
 
    public boolean isError()
@@ -81,6 +96,11 @@ public class Response
       return wrapped.getStatusLine().getStatusCode();
    }
 
+   public StatusLine statusLine()
+   {
+      return wrapped.getStatusLine();
+   }
+
    @Override
    public String toString()
    {
@@ -90,5 +110,18 @@ public class Response
    public <T> T with(ResponseClosure<T, Response> closure)
    {
       return closure.on(this);
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see java.lang.Object#finalize()
+    */
+   protected void finalize() throws Throwable
+   {
+      if (wrapped != null) {
+         discardContent();
+      }
+      super.finalize();
    }
 }

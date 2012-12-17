@@ -12,24 +12,24 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.protocol.BasicHttpContext;
 
 public abstract class BaseClient implements Client
 {
-   private final BasicHttpContext localContext;
+   // TODO lazy creation
+   protected AuthCache authCache;
 
-   private final AuthCache authCache;
+   protected CredentialsProvider credentialsProvider;
 
-   private CredentialsProvider credentialsProvider;
-
-   private CookieStore cookieStore;
+   protected CookieStore cookieStore;
 
    public BaseClient()
    {
-      this.localContext = new BasicHttpContext();
       this.authCache = new BasicAuthCache();
       this.credentialsProvider = new BasicCredentialsProvider();
+      this.cookieStore = new BasicCookieStore();
    }
 
    /*
@@ -184,10 +184,11 @@ public abstract class BaseClient implements Client
 
    protected BasicHttpContext prepareLocalContext()
    {
-      this.localContext.setAttribute(ClientContext.CREDS_PROVIDER, this.credentialsProvider);
-      this.localContext.setAttribute(ClientContext.AUTH_CACHE, this.authCache);
-      this.localContext.setAttribute(ClientContext.COOKIE_STORE, this.cookieStore);
-      return this.localContext;
+      BasicHttpContext localContext = new BasicHttpContext();
+      localContext.setAttribute(ClientContext.CREDS_PROVIDER, this.credentialsProvider);
+      localContext.setAttribute(ClientContext.AUTH_CACHE, this.authCache);
+      localContext.setAttribute(ClientContext.COOKIE_STORE, this.cookieStore);
+      return localContext;
    }
 
 }

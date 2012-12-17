@@ -29,7 +29,7 @@ public class SerializableResponse implements Serializable
       return bytes;
    }
 
-   public int getStatus()
+   public int status()
    {
       return status;
    }

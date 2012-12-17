@@ -47,9 +47,9 @@ public class TestErrors extends BaseHttpTest
       Map<String, Object> out = Marmalade.Get(baseUrl + "/").withErrorHandler(new ErrorHandler()
       {
          @Override
-         public void onError(HttpResponse response)
+         public void onError(Response response)
          {
-            Assert.assertEquals(response.getStatusLine().getStatusCode(), HttpStatus.SC_FORBIDDEN);
+            Assert.assertEquals(response.status(), HttpStatus.SC_FORBIDDEN);
          }
       }).map();
 

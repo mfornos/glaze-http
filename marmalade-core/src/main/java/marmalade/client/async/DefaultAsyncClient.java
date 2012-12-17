@@ -226,15 +226,16 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
 
    protected BasicHttpContext prepareLocalContext()
    {
+      // XXX check this
       BasicHttpContext ctx = super.prepareLocalContext();
-      // XXX Async scheme patch
       ctx.removeAttribute(ClientContext.AUTH_CACHE);
       return ctx;
    }
 
    private HttpAsyncClient activateIfNeeded()
    {
-      if (IOReactorStatus.INACTIVE.equals(httpClient.getStatus())) {
+      IOReactorStatus status = httpClient.getStatus();
+      if (IOReactorStatus.INACTIVE.equals(status)) {
          httpClient.start();
       }
       return httpClient;

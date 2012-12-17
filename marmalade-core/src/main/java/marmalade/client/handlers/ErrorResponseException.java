@@ -1,9 +1,8 @@
 package marmalade.client.handlers;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-
 import marmalade.MarmaladeException;
+import marmalade.client.Response;
+import marmalade.client.wire.tasks.SerializableResponse;
 
 /**
  * Exception for HTTP error conditions.
@@ -12,33 +11,24 @@ import marmalade.MarmaladeException;
 public class ErrorResponseException extends MarmaladeException
 {
 
-   private final HttpResponse response;
-   private final StatusLine statusLine;
-   private final int statusCode;
+   private final SerializableResponse response;
 
    private static final long serialVersionUID = -1447820840370028597L;
 
-   public ErrorResponseException(HttpResponse response)
+   public ErrorResponseException(Response response)
    {
-      super(response.getStatusLine().toString());
-      this.response = response;
-      this.statusLine = response.getStatusLine();
-      this.statusCode = statusLine.getStatusCode();
+      super(response.statusLine().toString());
+      this.response = new SerializableResponse(response);
    }
 
-   public HttpResponse getResponse()
+   public SerializableResponse getResponse()
    {
       return response;
    }
 
    public int getStatusCode()
    {
-      return statusCode;
-   }
-
-   public StatusLine getStatusLine()
-   {
-      return statusLine;
+      return response.status();
    }
 
 }

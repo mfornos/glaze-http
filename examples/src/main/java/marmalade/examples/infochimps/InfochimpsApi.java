@@ -2,10 +2,9 @@ package marmalade.examples.infochimps;
 
 import java.net.URI;
 
+import marmalade.client.Response;
 import marmalade.client.UriBuilder;
 import marmalade.client.handlers.ErrorHandler;
-
-import org.apache.http.HttpResponse;
 
 public class InfochimpsApi
 {
@@ -32,9 +31,9 @@ public class InfochimpsApi
    {
 
       @Override
-      public void onError(HttpResponse response)
+      public void onError(Response response)
       {
-         int status = response.getStatusLine().getStatusCode();
+         int status = response.status();
          switch (status) {
          case 400:
             error("(Bad Request) A bad endpoint, or a bad parameter name/value.");

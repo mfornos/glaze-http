@@ -7,16 +7,13 @@ import marmalade.client.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.util.EntityUtils;
 
-public class DefaultResponseHandler implements ResponseHandler<Response>
+public abstract class DefaultResponseHandler implements ResponseHandler<Response>
 {
 
-   private final ErrorHandler errorHandler;
-
-   public DefaultResponseHandler(ErrorHandler errorHandler)
+   public DefaultResponseHandler()
    {
-      this.errorHandler = errorHandler;
+
    }
 
    @Override
@@ -25,14 +22,15 @@ public class DefaultResponseHandler implements ResponseHandler<Response>
       Response response = new Response(httpResponse);
       if (response.isError()) {
          try {
-            // TODO signal entity consumption on return?
-            errorHandler.onError(httpResponse);
-            return null;
+            return onError(response);
          } finally {
-            EntityUtils.consumeQuietly(httpResponse.getEntity());
+            response.discardContent();
          }
       }
-      return response;
+      return onResponse(response);
    }
 
+   abstract protected Response onResponse(Response response);
+
+   abstract protected Response onError(Response response);
 }

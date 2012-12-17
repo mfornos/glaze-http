@@ -1,6 +1,6 @@
 package marmalade.client.handlers;
 
-import org.apache.http.HttpResponse;
+import marmalade.client.Response;
 
 /**
  * Handles error conditions on HTTP interactions.
@@ -9,6 +9,6 @@ import org.apache.http.HttpResponse;
 public interface ErrorHandler
 {
 
-   void onError(HttpResponse response);
+   void onError(Response response);
 
 }

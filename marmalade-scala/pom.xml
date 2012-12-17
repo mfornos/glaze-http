@@ -25,6 +25,12 @@
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-scala</artifactId>
 			<version>${jackson-scala.version}</version>
+			<exclusions>
+			  <exclusion>
+			    <groupId>org.scala-lang</groupId>
+			    <artifactId>scala-library</artifactId>
+			  </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.scala-lang</groupId>

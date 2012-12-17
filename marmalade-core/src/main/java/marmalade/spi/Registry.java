@@ -179,6 +179,11 @@ public class Registry
       initialize();
    }
 
+   protected Map<Class<?>, Object> services()
+   {
+      return services;
+   }
+
    private void fallbackRegisterService(Class<?> type, Callable<?> load)
    {
       Object impl = locateServiceContrib(type);
@@ -196,6 +201,8 @@ public class Registry
 
    private void initialize()
    {
+
+      Runtime.getRuntime().addShutdownHook(new RegistryShutdownHook());
 
       fallbackRegisterService(SyncClient.class, new Callable<SyncClient>()
       {
