@@ -53,7 +53,7 @@ public class MockHttpServer
          for (Condition cond : conditions) {
             found = cond.match(req);
             if (found != null) {
-               found.wrap(response);
+               found.wrap(response, req, data);
                return;
             }
          }

@@ -5,8 +5,11 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import marmalade.test.http.Producers.Producer;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ public class ResponseBuilder
    private int status;
    private String content;
    // TODO multimap?
-   private Map<String, String> headers;
+   private Map<String, Producer> headers;
 
    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseBuilder.class);
 
@@ -31,10 +34,15 @@ public class ResponseBuilder
    {
       this.root = root;
       this.status = status;
-      this.headers = new HashMap<String, String>();
+      this.headers = new HashMap<String, Producer>();
    }
 
    public ResponseBuilder and(String key, String value)
+   {
+      return and(key, Producers.id(value));
+   }
+
+   public ResponseBuilder and(String key, Producer value)
    {
       this.headers.put(key, value);
       return this;
@@ -73,13 +81,13 @@ public class ResponseBuilder
       return "ResponseBuilder [status=" + status + ", content=" + content + ", headers=" + headers + "]";
    }
 
-   public Response wrap(Response response)
+   public Response wrap(Response response, Request request, String data)
    {
       response.setCode(status);
       response.setContentLength(content.length());
 
-      for (Map.Entry<String, String> header : headers.entrySet()) {
-         response.set(header.getKey(), header.getValue());
+      for (Map.Entry<String, Producer> header : headers.entrySet()) {
+         response.set(header.getKey(), header.getValue().produce(request));
       }
 
       PrintStream body = null;

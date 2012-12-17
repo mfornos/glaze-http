@@ -564,6 +564,23 @@ public final class Marmalade
     * @return builder instance
     * @see HttpHeaders
     */
+   public Marmalade addHeader(final String name, final Object value)
+   {
+      return addHeader(name, value.toString());
+   }
+
+   /**
+    * Adds a HTTP header. The request-header fields allow the client to pass
+    * additional information about the request, and about the client itself, to
+    * the server.
+    * 
+    * @param name
+    *           The header name
+    * @param value
+    *           The header value
+    * @return builder instance
+    * @see HttpHeaders
+    */
    public Marmalade addHeader(final String name, final String value)
    {
       this.request.addHeader(name, value);
