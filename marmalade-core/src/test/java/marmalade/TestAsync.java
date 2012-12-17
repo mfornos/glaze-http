@@ -88,17 +88,18 @@ public class TestAsync extends BaseHttpTest
       server.expect(Condition.when("POST").path("/scott").respond("{\"id\":\"scott\"}", ContentType.APPLICATION_JSON));
       server.expect(Condition.when("POST").path("/tiger").respond("{\"id\":\"tiger\"}", ContentType.APPLICATION_JSON));
 
-      CounterCallback<Member> callback = new CounterCallback<Member>();
-
       Card in = new Card("Hello", "world", "0989080");
 
       try {
-         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, callback);
-         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), callback);
+         CounterCallback<Member> scottCb = new CounterCallback<Member>();
+         CounterCallback<Member> tigerCb = new CounterCallback<Member>();
+         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, scottCb);
+         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), tigerCb);
 
          Assert.assertEquals(scott.get().id, "scott");
          Assert.assertEquals(tiger.get().id, "tiger");
-         Assert.assertEquals(callback.counter.get(), 2);
+         Assert.assertEquals(scottCb.counter.get(), 1);
+         Assert.assertEquals(tigerCb.counter.get(), 1);
       } finally {
          EndAsync();
       }
