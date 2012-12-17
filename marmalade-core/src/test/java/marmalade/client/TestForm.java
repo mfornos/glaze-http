@@ -6,6 +6,8 @@ import static marmalade.client.Form.newForm;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import marmalade.test.http.BaseHttpTest;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.ParseException;
@@ -15,7 +17,7 @@ import org.apache.http.util.EntityUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestForm
+public class TestForm extends BaseHttpTest
 {
 
    @Test

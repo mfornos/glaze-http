@@ -89,19 +89,18 @@ public class TestAsync extends BaseHttpTest
       server.expect(Condition.when("POST").path("/tiger").respond("{\"id\":\"tiger\"}", ContentType.APPLICATION_JSON));
 
       Card in = new Card("Hello", "world", "0989080");
-
+      AsyncClient client = new DefaultAsyncClient();
       try {
-         CounterCallback<Member> scottCb = new CounterCallback<Member>();
-         CounterCallback<Member> tigerCb = new CounterCallback<Member>();
-         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, scottCb);
-         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), tigerCb);
+         CounterCallback<Member> callback = new CounterCallback<Member>();
+
+         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, callback);
+         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), callback);
 
          Assert.assertEquals(scott.get().id, "scott");
          Assert.assertEquals(tiger.get().id, "tiger");
-         Assert.assertEquals(scottCb.counter.get(), 1);
-         Assert.assertEquals(tigerCb.counter.get(), 1);
+         Assert.assertEquals(callback.counter.get(), 2);
       } finally {
-         EndAsync();
+         client.shutdown();
       }
    }
 
@@ -113,6 +112,7 @@ public class TestAsync extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
 
       try {
+
          List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
 
          futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client));
@@ -124,6 +124,7 @@ public class TestAsync extends BaseHttpTest
          for (Future<HttpResponse> resp : futures) {
             Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
          }
+
       } finally {
          client.shutdown();
       }
