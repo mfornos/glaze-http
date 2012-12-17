@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 
 public class TestContextIndependence extends BaseHttpTest
 {
-   @Test
+   @Test(timeOut = 5000)
    public void asyncCookiesIndependence() throws InterruptedException, ExecutionException
    {
       server.expect(when("GET").path(ANY).respond(200).and("Set-Cookie", headers("PART_NUMBER=RIDING_ROCKET_%s; path=/", "count")));
@@ -58,24 +58,25 @@ public class TestContextIndependence extends BaseHttpTest
             Assert.assertEquals(response.status(), 200);
             response.discardContent();
          }
+
+         for (int i = 0; i < 10; i++) {
+            HttpContext httpContext = contexts.get(i);
+            RequestWrapper requestWrapper = (RequestWrapper) httpContext.getAttribute("http.request");
+            Assert.assertEquals(requestWrapper.getURI().toString(), "/" + i);
+            Assert.assertEquals(httpContext.getAttribute("custom"), i);
+            BasicCookieStore cookieStore = (BasicCookieStore) httpContext.getAttribute(ClientContext.COOKIE_STORE);
+            List<Cookie> cookies = cookieStore.getCookies();
+            for (Cookie c : cookies) {
+               Assert.assertEquals(c.getValue(), "RIDING_ROCKET_" + i);
+            }
+         }
+
       } finally {
          EndAsync();
       }
-
-      for (int i = 0; i < 10; i++) {
-         HttpContext httpContext = contexts.get(i);
-         RequestWrapper requestWrapper = (RequestWrapper) httpContext.getAttribute("http.request");
-         Assert.assertEquals(requestWrapper.getURI().toString(), "/" + i);
-         Assert.assertEquals(httpContext.getAttribute("custom"), i);
-         BasicCookieStore cookieStore = (BasicCookieStore) httpContext.getAttribute(ClientContext.COOKIE_STORE);
-         List<Cookie> cookies = cookieStore.getCookies();
-         for (Cookie c : cookies) {
-            Assert.assertEquals(c.getValue(), "RIDING_ROCKET_" + i);
-         }
-      }
    }
 
-   @Test
+   @Test(timeOut = 5000)
    public void syncCookiesIndependence() throws InterruptedException, ExecutionException
    {
       server.expect(when("GET").path(ANY).respond(200).and("Set-Cookie", headers("PART_NUMBER=RIDING_ROCKET_%s; path=/", "count")));
