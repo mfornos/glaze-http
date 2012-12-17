@@ -98,11 +98,10 @@ public class TestAsync extends BaseHttpTest
 
          Assert.assertEquals(scott.get().id, "scott");
          Assert.assertEquals(tiger.get().id, "tiger");
+         Assert.assertEquals(callback.counter.get(), 2);
       } finally {
          EndAsync();
       }
-
-      Assert.assertEquals(callback.counter.get(), 2);
    }
 
    @Test(timeOut = 5000)
