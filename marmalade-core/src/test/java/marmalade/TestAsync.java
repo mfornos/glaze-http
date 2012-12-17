@@ -93,8 +93,8 @@ public class TestAsync extends BaseHttpTest
       try {
          CounterCallback<Member> callback = new CounterCallback<Member>();
 
-         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(Member.class, callback);
-         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(Member.class, new BasicHttpContext(), callback);
+         Future<Member> scott = Post(baseUrl + "/scott").bean(in).as(APPLICATION_JSON).mapAsync(client, Member.class, callback);
+         Future<Member> tiger = Post(baseUrl + "/tiger", APPLICATION_JSON).bean(in).mapAsync(client, Member.class, new BasicHttpContext(), callback);
 
          Assert.assertEquals(scott.get().id, "scott");
          Assert.assertEquals(tiger.get().id, "tiger");
