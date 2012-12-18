@@ -19,7 +19,6 @@ import java.util.concurrent.Future;
 import marmalade.client.Response;
 import marmalade.test.http.BaseHttpTest;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -45,7 +44,7 @@ public class TestContextIndependence extends BaseHttpTest
          contexts.put(i, ctx);
       }
 
-      List<Future<HttpResponse>> tasks = new ArrayList<Future<HttpResponse>>();
+      List<Future<Response>> tasks = new ArrayList<Future<Response>>();
 
       try {
          for (int i = 0; i < 10; i++) {
@@ -53,8 +52,8 @@ public class TestContextIndependence extends BaseHttpTest
             tasks.add(Get(baseUrl + "/" + c).addHeader("count", c).sendAsync(contexts.get(c)));
          }
 
-         for (Future<HttpResponse> t : tasks) {
-            Response response = new Response(t.get());
+         for (Future<Response> t : tasks) {
+            Response response = t.get();
             Assert.assertEquals(response.status(), 200);
             response.discardContent();
          }

@@ -5,6 +5,8 @@ import java.util.concurrent.Future;
 
 import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
+import marmalade.client.Response;
+import marmalade.client.handlers.ErrorHandler;
 import marmalade.spi.Registry;
 import marmalade.util.RequestUtils;
 
@@ -12,7 +14,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
@@ -69,7 +70,7 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
 
       } else {
          try {
-
+            // Defaults to PoolingClientAsyncConnectionManager
             DefaultHttpAsyncClient hc = new DefaultHttpAsyncClient();
             HttpParams params = hc.getParams();
             HttpProtocolParamBean protocolBean = new HttpProtocolParamBean(params);
@@ -135,22 +136,21 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
    }
 
    @Override
-   public Future<HttpResponse> execute(HttpUriRequest request)
+   public Future<Response> execute(HttpUriRequest request)
    {
       return execute(request, null);
    }
 
    @Override
-   public Future<HttpResponse> execute(HttpUriRequest request, FutureCallback<HttpResponse> futureCallback)
+   public Future<Response> execute(HttpUriRequest request, FutureCallback<Response> futureCallback)
    {
       return execute(request, prepareLocalContext(), futureCallback);
    }
 
    @Override
-   public Future<HttpResponse> execute(HttpUriRequest request, HttpContext context,
-         FutureCallback<HttpResponse> futureCallback)
+   public Future<Response> execute(HttpUriRequest request, HttpContext context, FutureCallback<Response> futureCallback)
    {
-      return activateIfNeeded().execute(request, context, futureCallback);
+      return activateIfNeeded().execute(createAsyncProducer(request), new ResponseConsumer(), context, futureCallback);
    }
 
    public HttpAsyncClient getHttpClient()
@@ -161,25 +161,33 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type)
    {
-      return map(request, type, prepareLocalContext(), null);
+      return map(request, type, null);
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback)
+   public <T> Future<T> map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
    {
-      return map(request, type, prepareLocalContext(), futureCallback);
+      return map(request, type, prepareLocalContext(), null, errorHandler);
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context)
+   public <T> Future<T> map(HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
+         ErrorHandler errorHandler)
    {
-      return map(request, type, context, null);
+      return map(request, type, prepareLocalContext(), futureCallback, errorHandler);
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, FutureCallback<T> futureCallback)
+   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, ErrorHandler errorHandler)
    {
-      return activateIfNeeded().execute(createAsyncProducer(request), new MapperAsyncConsumer<T>(type), context, futureCallback);
+      return map(request, type, context, null, errorHandler);
+   }
+
+   @Override
+   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context,
+         FutureCallback<T> futureCallback, ErrorHandler errorHandler)
+   {
+      return activateIfNeeded().execute(createAsyncProducer(request), new MapperConsumer<T>(type, errorHandler), context, futureCallback);
    }
 
    public void proxyAuthPref(String... authpref)
@@ -226,8 +234,8 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
 
    protected BasicHttpContext prepareLocalContext()
    {
-      // XXX check this
       BasicHttpContext ctx = super.prepareLocalContext();
+      // XXX check this
       ctx.removeAttribute(ClientContext.AUTH_CACHE);
       return ctx;
    }

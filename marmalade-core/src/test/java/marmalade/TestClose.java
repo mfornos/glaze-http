@@ -58,7 +58,7 @@ public class TestClose extends BaseHttpTest
 
          Assert.assertEquals(cman.getTotalStats().getLeased(), 0);
 
-         Map<String, Object> out = Marmalade.Get(baseUrl + "/").withErrorHandler(new ErrorHandler()
+         Response out = Marmalade.Get(baseUrl + "/").withErrorHandler(new ErrorHandler()
          {
             @Override
             public void onError(Response response)
@@ -87,7 +87,7 @@ public class TestClose extends BaseHttpTest
 
          Assert.assertEquals(cman.getTotalStats().getLeased(), 0);
 
-         Map<String, Object> out = Marmalade.Get(baseUrl + "/").withHandler(new DefaultResponseHandler()
+         Response out = Marmalade.Get(baseUrl + "/").withHandler(new DefaultResponseHandler()
          {
             @Override
             public Response onError(Response response)
@@ -124,7 +124,7 @@ public class TestClose extends BaseHttpTest
 
          Assert.assertEquals(cman.getTotalStats().getLeased(), 0);
 
-         Map<String, Object> out = Marmalade.Get(baseUrl + "/").withHandler(new DefaultResponseHandler()
+         Response out = Marmalade.Get(baseUrl + "/").withHandler(new DefaultResponseHandler()
          {
             @Override
             public Response onError(Response response)

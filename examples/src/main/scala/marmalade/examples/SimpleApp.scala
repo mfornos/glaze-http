@@ -1,24 +1,21 @@
 package marmalade.examples
 
-import marmalade.Marmalade._
-import marmalade.spi.Registry
-import org.apache.http.entity.ContentType
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import marmalade.client.UriBuilder._
 import scala.collection.mutable
+
+import marmalade.Marmalade._
+import marmalade.client.UriBuilder._
+
+import org.apache.http.entity.ContentType
 import org.apache.http.HttpResponse
+import org.apache.http.util.EntityUtils
 import marmalade.client.Response
 import marmalade.client.handlers.ErrorHandler
 import marmalade.scala.MarmaladeHelpers
 import marmalade.client.handlers.DefaultResponseHandler
-import org.apache.http.util.EntityUtils
 
 object SimpleApp extends MarmaladeHelpers {
 
   def main(args: Array[String]): Unit = {
-
-    // Register scala module
-    Registry.lookupMapper(ContentType.APPLICATION_JSON).registerModule(DefaultScalaModule)
 
     // Simple GET with generic handler
     //

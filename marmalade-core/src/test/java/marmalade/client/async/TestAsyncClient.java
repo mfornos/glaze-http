@@ -5,6 +5,7 @@ import java.nio.CharBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import marmalade.client.Response;
 import marmalade.test.data.Member;
 import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
@@ -62,8 +63,8 @@ public class TestAsyncClient extends BaseHttpTest
 
       AsyncClient client = new DefaultAsyncClient();
       try {
-         Future<HttpResponse> future1 = client.execute(new HttpGet(baseUrl + "/"));
-         Assert.assertEquals(future1.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         Future<Response> future1 = client.execute(new HttpGet(baseUrl + "/"));
+         Assert.assertEquals(future1.get().status(), HttpStatus.SC_OK);
       } finally {
          client.shutdown();
       }
@@ -77,8 +78,8 @@ public class TestAsyncClient extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
       try {
          for (int i = 0; i < 10; i++) {
-            Future<HttpResponse> future1 = client.execute(new HttpGet(baseUrl + "/"));
-            Assert.assertEquals(future1.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+            Future<Response> future1 = client.execute(new HttpGet(baseUrl + "/"));
+            Assert.assertEquals(future1.get().status(), HttpStatus.SC_OK);
          }
       } finally {
          client.shutdown();
@@ -106,8 +107,8 @@ public class TestAsyncClient extends BaseHttpTest
       AsyncClient client = new DefaultAsyncClient();
       try {
          for (int i = 0; i < 10; i++) {
-            Future<HttpResponse> future1 = client.execute(new HttpGet(baseUrl + "/"));
-            Assert.assertEquals(future1.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+            Future<Response> future1 = client.execute(new HttpGet(baseUrl + "/"));
+            Assert.assertEquals(future1.get().status(), HttpStatus.SC_OK);
             client.reset();
          }
       } finally {

@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import marmalade.client.Response;
 import marmalade.client.async.AsyncClient;
 import marmalade.client.async.DefaultAsyncClient;
 import marmalade.test.data.Card;
@@ -113,7 +114,7 @@ public class TestAsync extends BaseHttpTest
 
       try {
 
-         List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
+         List<Future<Response>> futures = new ArrayList<Future<Response>>();
 
          futures.add(Marmalade.Post(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client));
          futures.add(Marmalade.Get(baseUrl + "/areq").sendAsync(client, new BasicHttpContext()));
@@ -121,8 +122,8 @@ public class TestAsync extends BaseHttpTest
          futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client));
          futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(client));
 
-         for (Future<HttpResponse> resp : futures) {
-            Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         for (Future<Response> resp : futures) {
+            Assert.assertEquals(resp.get().status(), HttpStatus.SC_OK);
          }
 
       } finally {
@@ -138,15 +139,15 @@ public class TestAsync extends BaseHttpTest
 
       AsyncClient client = new DefaultAsyncClient();
       try {
-         List<Future<HttpResponse>> futures = new ArrayList<Future<HttpResponse>>();
-         CounterCallback<HttpResponse> callback = new CounterCallback<HttpResponse>();
+         List<Future<Response>> futures = new ArrayList<Future<Response>>();
+         CounterCallback<Response> callback = new CounterCallback<Response>();
 
          futures.add(Marmalade.Put(baseUrl + "/areq").bean("hello").as(ContentType.DEFAULT_TEXT).sendAsync(client, new BasicHttpContext(), callback));
          futures.add(Marmalade.Head(baseUrl + "/areq").sendAsync(client, new BasicHttpContext(), callback));
          futures.add(Marmalade.Delete(baseUrl + "/areq").sendAsync(client, callback));
 
-         for (Future<HttpResponse> resp : futures) {
-            Assert.assertEquals(resp.get().getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+         for (Future<Response> resp : futures) {
+            Assert.assertEquals(resp.get().status(), HttpStatus.SC_OK);
          }
 
          Assert.assertEquals(callback.counter.get(), 3);

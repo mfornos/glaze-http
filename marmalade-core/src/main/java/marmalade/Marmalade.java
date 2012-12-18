@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.Future;
 
+import marmalade.client.Response;
 import marmalade.client.async.AsyncClient;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.sync.SyncClient;
@@ -28,7 +29,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -937,7 +937,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type)
    {
-      return client.map(build(), type);
+      return client.map(build(), type, errorHandler);
    }
 
    /**
@@ -953,7 +953,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, FutureCallback<T> callback)
    {
-      return client.map(build(), type, callback);
+      return client.map(build(), type, callback, errorHandler);
    }
 
    /**
@@ -969,7 +969,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context)
    {
-      return client.map(build(), type, context);
+      return client.map(build(), type, context, errorHandler);
    }
 
    /**
@@ -987,7 +987,12 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context, FutureCallback<T> callback)
    {
-      return client.map(build(), type, context, callback);
+      return client.map(build(), type, context, callback, errorHandler);
+   }
+
+   public <T> Future<T> mapAsync(AsyncClient client, TypeReference<T> type)
+   {
+      return mapAsync(client, TypeHelper.resolveClass(type));
    }
 
    /**
@@ -1143,7 +1148,7 @@ public final class Marmalade
     * 
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync()
+   public Future<Response> sendAsync()
    {
       return sendAsync(defaultAsyncClient());
    }
@@ -1155,7 +1160,7 @@ public final class Marmalade
     *           The execution client.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(AsyncClient client)
+   public Future<Response> sendAsync(AsyncClient client)
    {
       return client.execute(build());
    }
@@ -1169,7 +1174,7 @@ public final class Marmalade
     *           The FutureCallback.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(AsyncClient client, FutureCallback<HttpResponse> callback)
+   public Future<Response> sendAsync(AsyncClient client, FutureCallback<Response> callback)
    {
       return client.execute(build(), callback);
    }
@@ -1183,7 +1188,7 @@ public final class Marmalade
     *           The HTTP context.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(AsyncClient client, HttpContext context)
+   public Future<Response> sendAsync(AsyncClient client, HttpContext context)
    {
       return client.execute(build(), context, null);
    }
@@ -1199,7 +1204,7 @@ public final class Marmalade
     *           The FutureCallback.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(AsyncClient client, HttpContext context, FutureCallback<HttpResponse> callback)
+   public Future<Response> sendAsync(AsyncClient client, HttpContext context, FutureCallback<Response> callback)
    {
       return client.execute(build(), context, callback);
    }
@@ -1211,7 +1216,7 @@ public final class Marmalade
     *           The FutureCallback.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(FutureCallback<HttpResponse> callback)
+   public Future<Response> sendAsync(FutureCallback<Response> callback)
    {
       return sendAsync(defaultAsyncClient(), callback);
    }
@@ -1223,7 +1228,7 @@ public final class Marmalade
     *           The HTTP context
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(HttpContext context)
+   public Future<Response> sendAsync(HttpContext context)
    {
       return sendAsync(defaultAsyncClient(), context);
    }
@@ -1237,7 +1242,7 @@ public final class Marmalade
     *           The FutureCallback.
     * @return the future response
     */
-   public Future<HttpResponse> sendAsync(HttpContext context, FutureCallback<HttpResponse> callback)
+   public Future<Response> sendAsync(HttpContext context, FutureCallback<Response> callback)
    {
       return sendAsync(defaultAsyncClient(), context, callback);
    }

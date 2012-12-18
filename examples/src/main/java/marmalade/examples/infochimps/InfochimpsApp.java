@@ -36,6 +36,9 @@ public class InfochimpsApp
       app.ufoSight(query);
    }
 
+   // Here for example purposes.
+   // Logically it must be encapsulated in the Api class.
+
    private void influence(String screenName)
    {
       URI uri = uriInfluenceMetrics(API_KEY, screenName);

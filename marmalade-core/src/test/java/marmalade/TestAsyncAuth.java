@@ -10,7 +10,6 @@ import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
 
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AUTH;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -30,9 +29,9 @@ public class TestAsyncAuth extends BaseHttpTest
       client.auth(new UsernamePasswordCredentials("hello", "world"));
 
       try {
-         Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/basic").sendAsync(client);
+         Future<Response> fr = Marmalade.Get(baseUrl + "/auth/basic").sendAsync(client);
 
-         Response response = new Response(fr.get());
+         Response response = fr.get();
          Assert.assertEquals(response.status(), 200);
          Assert.assertEquals(response.asString(), "yellow");
       } finally {
@@ -49,9 +48,9 @@ public class TestAsyncAuth extends BaseHttpTest
       client.auth(new UsernamePasswordCredentials("hello", "world"));
 
       try {
-         Future<HttpResponse> fr = Marmalade.Get(baseUrl + "/auth/digest").sendAsync(client);
+         Future<Response> fr = Marmalade.Get(baseUrl + "/auth/digest").sendAsync(client);
 
-         Response response = new Response(fr.get());
+         Response response = fr.get();
          Assert.assertEquals(response.status(), 200);
          Assert.assertEquals(response.asString(), "yellow");
       } finally {
