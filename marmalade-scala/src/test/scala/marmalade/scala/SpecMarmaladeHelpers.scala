@@ -26,7 +26,7 @@ class SpecMarmaladeHelpers extends HttpSpec {
     server.expect(when("GET").path("/").respond("OK"))
 
     expect(200) {
-      Get(baseUri).send[Response].status
+      Get(baseUri).send.status
     }
   }
 
@@ -35,7 +35,7 @@ class SpecMarmaladeHelpers extends HttpSpec {
 
     Get(baseUri).withHandler((r: HttpResponse) => {
       assert("OK" === EntityUtils.toString(r.getEntity))
-    }).send[Any]
+    }).execute[Any]
   }
 
   "Map get request" should "return a Card with id 'ABCDEFG'" in withHttpServer { server =>

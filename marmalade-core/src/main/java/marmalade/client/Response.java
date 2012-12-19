@@ -6,6 +6,7 @@ import java.io.InputStream;
 import marmalade.MarmaladeException;
 import marmalade.func.Closures.ResponseClosure;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -69,6 +70,12 @@ public class Response
    public HttpResponse getHttpResponse()
    {
       return wrapped;
+   }
+
+   public String header(String name)
+   {
+      Header header = wrapped.getFirstHeader(name);
+      return (header == null) ? null : header.getValue();
    }
 
    public boolean isEmpty()

@@ -22,7 +22,7 @@ object SimpleApp extends MarmaladeHelpers {
     Get("http://www.opera.com/").withHandler { r: HttpResponse =>
       println("Handling: %s".format(r))
       EntityUtils.consumeQuietly(r.getEntity)
-    }.send[Any]
+    }.execute
 
     // Simple GET with handler
     //
@@ -35,11 +35,11 @@ object SimpleApp extends MarmaladeHelpers {
         println("Ok: %s".format(r))
         r
       }
-    }).send[Response].discardContent
+    }).execute[Response].discardContent
 
     // Simple GET without handler
     //
-    Get("http://ask.com/").send[Response].discardContent.status match {
+    Get("http://ask.com/").send.discardContent.status match {
       case 200 => println("OK")
       case x if x > 200 => println(x)
       case _ => println("WTF?")

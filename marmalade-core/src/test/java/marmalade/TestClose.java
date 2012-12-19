@@ -103,7 +103,7 @@ public class TestClose extends BaseHttpTest
                Assert.fail("response OK invocation");
                return null;
             }
-         }).send(client);
+         }).execute(client);
 
          Assert.assertNull(out);
          Assert.assertEquals(cman.getTotalStats().getLeased(), 0);
@@ -140,7 +140,7 @@ public class TestClose extends BaseHttpTest
                Assert.assertEquals(response.status(), HttpStatus.SC_ACCEPTED);
                return null;
             }
-         }).send(client);
+         }).execute(client);
 
          Assert.assertNull(out);
          Assert.assertEquals(cman.getTotalStats().getLeased(), 0);

@@ -12,6 +12,7 @@
 
 ;; $ lein run http://www.ask.com
 
+;; ok, clean dot dot instead of -> . :P
 (defn map-request [uri]
   "Maps a Get request with an ErrorHandler"
   (.. (Get uri)
@@ -19,7 +20,7 @@
           (reify ErrorHandler
             (onError[this response] 
               (println (str response " error went through handler")))))
-        (map)))
+        map))
 
 (defn send-request-rh [uri]
   "Sends a Get request with a ResponseHandler"
@@ -29,7 +30,7 @@
             (handleResponse[this response] 
               (println (str response " went through handler"))
               (EntityUtils/toString (.getEntity response)))))
-        (send)))
+        send))
 
 (defn send-request-eh [uri]
   "Sends a Get request with an ErrorHandler"
@@ -38,11 +39,11 @@
           (reify ErrorHandler
             (onError[this response] 
               (println (str response " error went through handler")))))
-        (send)))
+        send))
 
 (defn send-request [uri]
   "Sends a Get request"
-  (.. (Get uri) (send)))
+  (.. (Get uri) send))
 
 
 (defn -main [uri]

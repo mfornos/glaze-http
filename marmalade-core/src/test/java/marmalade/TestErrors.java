@@ -68,7 +68,7 @@ public class TestErrors extends BaseHttpTest
          {
             return null;
          }
-      }).send();
+      }).execute();
 
       Assert.assertNull(out);
    }

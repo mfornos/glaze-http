@@ -55,6 +55,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Preconditions;
 
 /**
  * <p>
@@ -767,6 +768,58 @@ public final class Marmalade
    }
 
    /**
+    * Executes the current request.
+    * 
+    * @return the response
+    */
+   public <T> T execute()
+   {
+      return execute(defaultSyncClient());
+   }
+
+   /**
+    * Executes the current request with the given context.
+    * 
+    * @param context
+    *           the HTTP context
+    * @return the response
+    */
+   public <T> T execute(HttpContext context)
+   {
+      return execute(defaultSyncClient(), context);
+   }
+
+   /**
+    * Executes the current request.
+    * 
+    * @param client
+    *           The execution client.
+    * @return the response
+    */
+   @SuppressWarnings("unchecked")
+   public <T> T execute(SyncClient client)
+   {
+      return (T) (responseHandler == null ? client.execute(build(), errorHandler)
+            : client.execute(request, responseHandler));
+   }
+
+   /**
+    * Executes the current request.
+    * 
+    * @param client
+    *           The execution client.
+    * @param context
+    *           The HTTP context.
+    * @return the response
+    */
+   @SuppressWarnings("unchecked")
+   public <T> T execute(SyncClient client, HttpContext context)
+   {
+      return (T) (responseHandler == null ? client.execute(build(), errorHandler, context)
+            : client.execute(request, responseHandler, context));
+   }
+
+   /**
     * Maps the response to a {@link Map}.
     * 
     * @return a Map filled with values of the response
@@ -1096,7 +1149,7 @@ public final class Marmalade
     * 
     * @return the response
     */
-   public <T> T send()
+   public Response send()
    {
       return send(defaultSyncClient());
    }
@@ -1108,7 +1161,7 @@ public final class Marmalade
     *           the HTTP context
     * @return the response
     */
-   public <T> T send(HttpContext context)
+   public Response send(HttpContext context)
    {
       return send(defaultSyncClient(), context);
    }
@@ -1120,11 +1173,11 @@ public final class Marmalade
     *           The execution client.
     * @return the response
     */
-   @SuppressWarnings("unchecked")
-   public <T> T send(SyncClient client)
+   public Response send(SyncClient client)
    {
-      return (T) (responseHandler == null ? client.execute(build(), errorHandler)
-            : client.execute(request, responseHandler));
+      Preconditions.checkArgument(responseHandler == null, "Response handler is not null, please use the 'execute' method instead of 'send'");
+
+      return client.execute(build(), errorHandler);
    }
 
    /**
@@ -1136,11 +1189,11 @@ public final class Marmalade
     *           The HTTP context.
     * @return the response
     */
-   @SuppressWarnings("unchecked")
-   public <T> T send(SyncClient client, HttpContext context)
+   public Response send(SyncClient client, HttpContext context)
    {
-      return (T) (responseHandler == null ? client.execute(build(), errorHandler, context)
-            : client.execute(request, responseHandler, context));
+      Preconditions.checkArgument(responseHandler == null, "Response handler is not null, please use the 'execute' method instead of 'send'");
+
+      return client.execute(build(), errorHandler, context);
    }
 
    /**
@@ -1245,6 +1298,18 @@ public final class Marmalade
    public Future<Response> sendAsync(HttpContext context, FutureCallback<Response> callback)
    {
       return sendAsync(defaultAsyncClient(), context, callback);
+   }
+
+   /**
+    * Specifies the accept HTTP header.
+    * 
+    * @param contentType
+    *           The content type
+    * @return builder instance
+    */
+   public Marmalade setAccept(ContentType contentType)
+   {
+      return addHeader(HttpHeaders.ACCEPT, contentType.getMimeType());
    }
 
    /**
