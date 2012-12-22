@@ -16,7 +16,7 @@ public class TestOAuth extends BaseHttpTest
 {
 
    @Test
-   public void preemtive()
+   public void preemptive()
    {
       String answer = ".*oauth_signature=\".*\".*oauth_signature_method=\"HMAC-SHA1\",.*";
       server.expect(Condition.when("GET").path("/").header(HttpHeaders.AUTHORIZATION, regex(answer)).respond("yellow", ContentType.DEFAULT_TEXT));

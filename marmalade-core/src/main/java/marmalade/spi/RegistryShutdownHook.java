@@ -1,6 +1,7 @@
 package marmalade.spi;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -20,12 +21,11 @@ public class RegistryShutdownHook extends Thread
    public void run()
    {
       LOGGER.info("Shutting down...");
-      Map<Class<?>, Object> services = Registry.instance().services();
 
-      for (Class<?> clazz : services.keySet()) {
-         callIfNeeded(services.get(clazz), clazz.getMethods());
+      Collection<Registry> instances = Registry.instances();
+      for (Registry instance : instances) {
+         shutdownInstance(instance);
       }
-
    }
 
    private void callIfNeeded(Object instance, Method[] methods)
@@ -39,6 +39,17 @@ public class RegistryShutdownHook extends Thread
                LOGGER.error(e.getMessage(), e);
             }
          }
+      }
+   }
+
+   private void shutdownInstance(Registry instance)
+   {
+      LOGGER.info("Namespace: '{}'", instance.namespace());
+      
+      Map<Class<?>, Object> services = instance.services();
+
+      for (Class<?> clazz : services.keySet()) {
+         callIfNeeded(services.get(clazz), clazz.getMethods());
       }
    }
 

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 /**
  * Response handler that maps the content of the response to a bean according to
@@ -29,8 +30,6 @@ import com.google.common.base.Optional;
 public class MapperResponseHandler<T> implements ResponseHandler<T>
 {
 
-   private static final ErrorHandler DEFAULT_EH = new CroakErrorHandler();
-
    private static final Logger LOGGER = LoggerFactory.getLogger(MapperResponseHandler.class);
 
    private final Class<T> type;
@@ -39,26 +38,46 @@ public class MapperResponseHandler<T> implements ResponseHandler<T>
 
    private final ErrorHandler errorHandler;
 
+   private final String namespace;
+
    public MapperResponseHandler(Class<T> type)
    {
-      this(type, DEFAULT_EH, null);
+      this(Registry.NS_DEFAULT, type, CroakErrorHandler.instance(), null);
    }
 
    public MapperResponseHandler(Class<T> type, ContentType override)
    {
-      this(type, DEFAULT_EH, override);
+      this(Registry.NS_DEFAULT, type, CroakErrorHandler.instance(), override);
    }
 
    public MapperResponseHandler(Class<T> type, ErrorHandler errorHandler)
    {
-      this(type, errorHandler, null);
+      this(Registry.NS_DEFAULT, type, errorHandler, null);
    }
 
-   public MapperResponseHandler(Class<T> type, ErrorHandler errorHandler, ContentType override)
+   public MapperResponseHandler(String namespace, Class<T> type)
    {
+      this(namespace, type, CroakErrorHandler.instance(), null);
+   }
+
+   public MapperResponseHandler(String namespace, Class<T> type, ContentType override)
+   {
+      this(namespace, type, CroakErrorHandler.instance(), override);
+   }
+
+   public MapperResponseHandler(String namespace, Class<T> type, ErrorHandler errorHandler)
+   {
+      this(namespace, type, errorHandler, null);
+   }
+
+   public MapperResponseHandler(String namespace, Class<T> type, ErrorHandler errorHandler, ContentType override)
+   {
+      Preconditions.checkNotNull(type, "Type must not be null");
+
       this.type = type;
       this.override = override;
-      this.errorHandler = Optional.fromNullable(errorHandler).or(DEFAULT_EH);
+      this.errorHandler = errorHandler == null ? CroakErrorHandler.instance() : errorHandler;
+      this.namespace = Optional.fromNullable(namespace).or(Registry.NS_DEFAULT);
    }
 
    @Override
@@ -92,13 +111,13 @@ public class MapperResponseHandler<T> implements ResponseHandler<T>
       InputStream is = null;
       try {
          String contentType = isOverriden() ? override.getMimeType() : MimeResolver.resolve(response);
-         ObjectMapper mapper = Registry.lookupMapper(contentType);
+         ObjectMapper mapper = Registry.lookupMapper(namespace, contentType);
 
          HttpEntity entity = response.getEntity();
          is = entity.getContent();
 
          if (mapper == null) {
-            throw new MarmaladeException(String.format("Unable to resolve mapper for type %s", contentType));
+            throw new MarmaladeException(String.format("Unable to resolve mapper for type '%s' in namespace '%s'", contentType, namespace));
          }
 
          return mapper.readValue(is, type);

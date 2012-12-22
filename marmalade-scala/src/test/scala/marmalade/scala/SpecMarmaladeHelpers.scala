@@ -16,7 +16,7 @@ import org.apache.http.nio.IOControl
 import org.apache.http.protocol.HttpContext
 import marmalade.func.Closures.Closure
 import org.apache.http.client.methods.HttpRequestBase
-import marmalade.util.RequestUtils
+import marmalade.util.RequestUtil
 import org.apache.http.HttpEntity
 import scala.reflect.BeanProperty
 
@@ -54,8 +54,8 @@ class SpecMarmaladeHelpers extends HttpSpec {
     val card = Post(baseUri).bean(foo).as(APPLICATION_JSON).decorate(new Closure[HttpRequestBase] {
       // Test the content that will be sent
       override def on(req: HttpRequestBase) = {
-        val bean = EntityUtils.toString(RequestUtils.getEntity(req))
-        RequestUtils.setEntity(req, null);
+        val bean = EntityUtils.toString(RequestUtil.getEntity(req))
+        RequestUtil.setEntity(req, null);
         assert(bean === "{\"name\":\"TEST\"}")
       }
     }).map(classOf[Card])

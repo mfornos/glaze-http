@@ -10,6 +10,16 @@ import marmalade.client.Response;
 public class CroakErrorHandler implements ErrorHandler
 {
 
+   private static CroakErrorHandler instance;
+
+   public static synchronized ErrorHandler instance()
+   {
+      if (instance == null) {
+         instance = new CroakErrorHandler();
+      }
+      return instance;
+   }
+
    @Override
    public void onError(Response response)
    {

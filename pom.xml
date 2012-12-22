@@ -79,6 +79,7 @@
   	<module>marmalade-oauth</module>
   	<module>marmalade-test</module>
   	<module>marmalade-scala</module>
+  	<module>marmalade-soup</module>
   </modules>
   
   <build>

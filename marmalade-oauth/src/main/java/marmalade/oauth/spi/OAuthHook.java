@@ -3,7 +3,7 @@ package marmalade.oauth.spi;
 import marmalade.client.sync.SyncClient;
 import marmalade.oauth.OAuthSchemeFactory;
 import marmalade.oauth.PreemptiveAuthorizer;
-import marmalade.spi.HookContrib;
+import marmalade.spi.HookProvider;
 import marmalade.spi.Registry;
 
 import org.apache.http.impl.client.AbstractHttpClient;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  *
  */
-public class OAuthHook implements HookContrib
+public class OAuthHook implements HookProvider
 {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthHook.class);

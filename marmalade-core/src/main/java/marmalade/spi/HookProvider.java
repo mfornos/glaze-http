@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Hook SPI.
  */
-public interface HookContrib
+public interface HookProvider
 {
    boolean acceptService(Class<?> type);
 

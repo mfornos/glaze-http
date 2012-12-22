@@ -21,7 +21,7 @@ import marmalade.client.wire.tasks.SerializableResponse;
 import marmalade.func.Closures.Closure;
 import marmalade.spi.Registry;
 import marmalade.util.EntityMapper;
-import marmalade.util.RequestUtils;
+import marmalade.util.RequestUtil;
 import marmalade.util.TypeHelper;
 
 import org.apache.http.Consts;
@@ -118,22 +118,26 @@ import com.google.common.base.Preconditions;
  * 
  * <pre>
  * 
- * // Basic send async
- * 
  * try {
  * 
- *    Future&lt;HttpResponse&gt; response = Get(uri).sendAsync();
- *    response.get();
+ *    // Basic send async
  * 
- * } finally {
- *    EndAsync();
- * }
+ *    Future&lt;HttpResponse&gt; out = Get(uri).sendAsync();
+ *    out.get();
  * 
- * // Basic map async
- * 
- * try {
+ *    // Basic map async
  * 
  *    Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
+ *    out.get();
+ * 
+ *    // Streaming
+ * 
+ *    Future&lt;MyResult&gt; out = Get(uri).stream(myAsyncConsumer);
+ *    out.get();
+ * 
+ *    // With consumer
+ * 
+ *    Future&lt;MyResult&gt; out = Get(uri).withConsumer(myAsyncConsumer).executeAsync();
  *    out.get();
  * 
  * } finally {
@@ -178,21 +182,6 @@ import com.google.common.base.Preconditions;
  * }
  * 
  * Post(uri).bean(multipartBean).as(MULTIPART_FORM_DATA).send();
- * 
- * </pre>
- * 
- * <strong>Streaming</strong>
- * 
- * <pre>
- * 
- * try {
- * 
- *    Future&lt;MyResult&gt; result = Get(uri).stream(myAsyncConsumer);
- *    result.get();
- * 
- * } finally {
- *    EndAsync();
- * }
  * 
  * </pre>
  * 
@@ -527,14 +516,21 @@ public final class Marmalade
 
    private ErrorHandler errorHandler;
 
+   private String namespace;
+
    private ResponseHandler<?> responseHandler;
 
    private Closure<HttpRequestBase> requestClosure;
+
+   private HttpAsyncResponseConsumer<?> asyncConsumer;
+
+   private boolean repeatable;
 
    private Marmalade(HttpRequestBase request)
    {
       this.request = request;
       this.localParams = request.getParams();
+      this.repeatable = false;
    }
 
    /**
@@ -647,11 +643,12 @@ public final class Marmalade
    {
 
       if (needsEntityMapping(request)) {
-         entity = EntityMapper.map(bean, serializationType);
+         entity = EntityMapper.map(namespace, bean, serializationType, repeatable);
       }
 
-      if (entity != null && RequestUtils.isEnclosingEntity(request)) {
-         RequestUtils.setEntity(request, entity);
+      // TODO repeatable
+      if (entity != null && RequestUtil.isEnclosingEntity(request)) {
+         RequestUtil.setEntity(request, entity);
       }
 
       if (requestClosure != null) {
@@ -819,6 +816,19 @@ public final class Marmalade
             : client.execute(request, responseHandler, context));
    }
 
+   public <T> Future<T> executeAsync()
+   {
+      return executeAsync(defaultAsyncClient());
+   }
+
+   @SuppressWarnings("unchecked")
+   public <T> Future<T> executeAsync(AsyncClient client)
+   {
+      Preconditions.checkNotNull(asyncConsumer, "Please, specify an asynchronous consumer '.withConsumer(consumer)'.");
+
+      return (Future<T>) stream(client, asyncConsumer);
+   }
+
    /**
     * Maps the response to a {@link Map}.
     * 
@@ -898,7 +908,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type)
    {
-      return client.map(build(), type, errorHandler);
+      return client.map(namespace, build(), type, errorHandler);
    }
 
    /**
@@ -914,7 +924,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, ContentType overrideType)
    {
-      return client.map(build(), type, overrideType);
+      return client.map(namespace, build(), type, overrideType);
    }
 
    /**
@@ -930,7 +940,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, HttpContext context)
    {
-      return client.map(build(), context, type);
+      return client.map(namespace, build(), context, type);
    }
 
    /**
@@ -948,7 +958,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, HttpContext context, ContentType overrideType)
    {
-      return client.map(build(), context, type, overrideType);
+      return client.map(namespace, build(), context, type, overrideType);
    }
 
    /**
@@ -990,7 +1000,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type)
    {
-      return client.map(build(), type, errorHandler);
+      return client.map(namespace, build(), type, errorHandler);
    }
 
    /**
@@ -1006,7 +1016,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, FutureCallback<T> callback)
    {
-      return client.map(build(), type, callback, errorHandler);
+      return client.map(namespace, build(), type, callback, errorHandler);
    }
 
    /**
@@ -1022,7 +1032,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context)
    {
-      return client.map(build(), type, context, errorHandler);
+      return client.map(namespace, build(), type, context, errorHandler);
    }
 
    /**
@@ -1040,7 +1050,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context, FutureCallback<T> callback)
    {
-      return client.map(build(), type, context, callback, errorHandler);
+      return client.map(namespace, build(), type, context, callback, errorHandler);
    }
 
    public <T> Future<T> mapAsync(AsyncClient client, TypeReference<T> type)
@@ -1105,6 +1115,16 @@ public final class Marmalade
    }
 
    /**
+    * @param namespace
+    * @return builder instance
+    */
+   public Marmalade ns(String namespace)
+   {
+      this.namespace = namespace;
+      return this;
+   }
+
+   /**
     * Removes a request configuration parameter.
     * 
     * @param param
@@ -1141,6 +1161,12 @@ public final class Marmalade
    public Marmalade removeHeaders(final String name)
    {
       this.request.removeHeaders(name);
+      return this;
+   }
+
+   public Marmalade repeatable()
+   {
+      this.repeatable = true;
       return this;
    }
 
@@ -1526,6 +1552,16 @@ public final class Marmalade
    }
 
    /**
+    * @param consumer
+    * @return builder instance
+    */
+   public <T> Marmalade withConsumer(HttpAsyncResponseConsumer<T> consumer)
+   {
+      this.asyncConsumer = consumer;
+      return this;
+   }
+
+   /**
     * Sets an error handler for the current request.
     * 
     * @param errorHandler
@@ -1555,12 +1591,12 @@ public final class Marmalade
 
    private AsyncClient defaultAsyncClient()
    {
-      return Registry.lookup(AsyncClient.class);
+      return namespace == null ? Registry.lookup(AsyncClient.class) : Registry.lookup(namespace, AsyncClient.class);
    }
 
    private SyncClient defaultSyncClient()
    {
-      return Registry.lookup(SyncClient.class);
+      return namespace == null ? Registry.lookup(SyncClient.class) : Registry.lookup(namespace, SyncClient.class);
    }
 
    private DateFormat getDateFormat()
@@ -1579,7 +1615,7 @@ public final class Marmalade
 
    private boolean needsEntityMapping(HttpUriRequest request)
    {
-      return entity == null && bean != null && RequestUtils.isEnclosingEntity(request) && hasContentType();
+      return entity == null && bean != null && RequestUtil.isEnclosingEntity(request) && hasContentType();
    }
 
    // TODO overrideType for mapAsync

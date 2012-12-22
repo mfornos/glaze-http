@@ -10,12 +10,16 @@ public class SerializableResponse implements Serializable
 {
    private static final long serialVersionUID = 6522661301517225640L;
 
-   private final byte[] bytes;
+   private byte[] bytes;
    private int status;
 
    public SerializableResponse(Response response)
    {
-      bytes = response.asBytes();
+      try {
+         bytes = response.asBytes();
+      } catch (Exception e) {
+         bytes = new byte[] {};
+      }
       status = response.status();
    }
 

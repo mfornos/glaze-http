@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  *
  */
-public interface MapperContrib
+public interface MapperProvider
 {
    String mimeType();
 

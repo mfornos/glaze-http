@@ -44,7 +44,7 @@ public class CASClient
 
       // 4. Logout
 
-      Delete(ticketUri);
+      Delete(ticketUri).send();
    }
 
    public static void main(String... args)

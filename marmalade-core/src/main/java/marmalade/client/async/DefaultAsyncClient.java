@@ -5,10 +5,12 @@ import java.util.concurrent.Future;
 
 import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
+import marmalade.client.Client;
 import marmalade.client.Response;
 import marmalade.client.handlers.ErrorHandler;
+import marmalade.client.interceptors.PreemptiveAuthorizer;
 import marmalade.spi.Registry;
-import marmalade.util.RequestUtils;
+import marmalade.util.RequestUtil;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -100,13 +102,20 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
       this.httpClient = httpClient;
    }
 
+   public Client authPreemptive(String schemeName)
+   {
+      DefaultHttpAsyncClient httpClient = (DefaultHttpAsyncClient) getHttpClient();
+      httpClient.addRequestInterceptor(new PreemptiveAuthorizer(schemeName), 0);
+      return this;
+   }
+
    @Override
    public HttpAsyncRequestProducer createAsyncProducer(HttpUriRequest request)
    {
       HttpAsyncRequestProducer producer;
       HttpHost target = URIUtils.extractHost(request.getURI());
 
-      if (RequestUtils.isEnclosingEntity(request)) {
+      if (RequestUtil.isEnclosingEntity(request)) {
          producer = createRequestProducer(request, target);
       } else {
          producer = new RequestProducerImpl(target, request);
@@ -161,33 +170,66 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type)
    {
-      return map(request, type, null);
+      return map(Registry.NS_DEFAULT, request, type);
    }
 
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
    {
-      return map(request, type, prepareLocalContext(), null, errorHandler);
+      return map(Registry.NS_DEFAULT, request, type, errorHandler);
    }
 
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
          ErrorHandler errorHandler)
    {
-      return map(request, type, prepareLocalContext(), futureCallback, errorHandler);
+      return map(Registry.NS_DEFAULT, request, type, futureCallback, errorHandler);
    }
 
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, ErrorHandler errorHandler)
    {
-      return map(request, type, context, null, errorHandler);
+      return map(Registry.NS_DEFAULT, request, type, context, errorHandler);
    }
 
    @Override
    public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context,
          FutureCallback<T> futureCallback, ErrorHandler errorHandler)
    {
-      return activateIfNeeded().execute(createAsyncProducer(request), new MapperConsumer<T>(type, errorHandler), context, futureCallback);
+      return map(Registry.NS_DEFAULT, request, type, context, futureCallback, errorHandler);
+   }
+
+   @Override
+   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type)
+   {
+      return map(namespace, request, type, null);
+   }
+
+   @Override
+   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   {
+      return map(namespace, request, type, prepareLocalContext(), null, errorHandler);
+   }
+
+   @Override
+   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
+         ErrorHandler errorHandler)
+   {
+      return map(namespace, request, type, prepareLocalContext(), futureCallback, errorHandler);
+   }
+
+   @Override
+   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
+         ErrorHandler errorHandler)
+   {
+      return map(namespace, request, type, context, null, errorHandler);
+   }
+
+   @Override
+   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
+         FutureCallback<T> futureCallback, ErrorHandler errorHandler)
+   {
+      return activateIfNeeded().execute(createAsyncProducer(request), new MapperConsumer<T>(namespace, type, errorHandler), context, futureCallback);
    }
 
    public void proxyAuthPref(String... authpref)

@@ -3,22 +3,23 @@ package marmalade.oauth.spi;
 import marmalade.client.Client;
 import marmalade.oauth.OAuthCredentials;
 import marmalade.oauth.OAuthSchemeFactory;
-import marmalade.spi.ServiceContrib;
+import marmalade.spi.ServiceProvider;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.client.CredentialsProvider;
 
-public abstract class DefaultCredentialsProvider implements OAuthCredentialsProvider, ServiceContrib
+public abstract class DefaultCredentialsProvider implements OAuthCredentialsProvider,
+      ServiceProvider<OAuthCredentialsProvider>
 {
 
    @Override
-   public Class<?> serviceClass()
+   public Class<OAuthCredentialsProvider> serviceClass()
    {
       return OAuthCredentialsProvider.class;
    }
 
    @Override
-   public Object serviceImpl()
+   public OAuthCredentialsProvider serviceImpl()
    {
       return this;
    }

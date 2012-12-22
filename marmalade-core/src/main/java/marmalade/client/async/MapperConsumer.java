@@ -1,7 +1,6 @@
 package marmalade.client.async;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import marmalade.client.Response;
 import marmalade.client.handlers.CroakErrorHandler;
@@ -9,77 +8,64 @@ import marmalade.client.handlers.ErrorHandler;
 import marmalade.mime.MimeResolver;
 import marmalade.spi.Registry;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.nio.ContentDecoder;
-import org.apache.http.nio.IOControl;
-import org.apache.http.nio.protocol.AbstractAsyncResponseConsumer;
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.nio.entity.ContentInputStream;
+import org.apache.http.nio.util.SimpleInputBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
-public class MapperConsumer<T> extends AbstractAsyncResponseConsumer<T>
+public class MapperConsumer<T> extends AbstractContentConsumer<T>
 {
 
-   private static final CroakErrorHandler EH = new CroakErrorHandler();
+   private static final Logger LOGGER = LoggerFactory.getLogger(MapperConsumer.class);
 
    private final Class<T> type;
 
    private final ErrorHandler errorHandler;
 
-   private volatile T obj;
-
-   private volatile Response response;
-
    private volatile ObjectMapper mapper;
+
+   private final String namespace;
 
    public MapperConsumer(Class<T> type)
    {
-      this(type, EH);
+      this(Registry.NS_DEFAULT, type, CroakErrorHandler.instance());
    }
 
    public MapperConsumer(Class<T> type, ErrorHandler errorHandler)
    {
-      Preconditions.checkNotNull(type, "Type must not be null");
-      this.type = type;
-      this.errorHandler = errorHandler;
+      this(Registry.NS_DEFAULT, type, errorHandler);
    }
 
-   @Override
-   protected T buildResult(HttpContext paramHttpContext) throws Exception
+   public MapperConsumer(String namespace, Class<T> type, ErrorHandler errorHandler)
    {
-      return obj;
+      Preconditions.checkNotNull(type, "Type must not be null");
+
+      this.type = type;
+      this.errorHandler = errorHandler == null ? CroakErrorHandler.instance() : errorHandler;
+      this.namespace = Optional.fromNullable(namespace).or(Registry.NS_DEFAULT);
    }
 
    @Override
-   protected void onContentReceived(ContentDecoder contentDecoder, IOControl control) throws IOException
+   protected T onBufferCompleted(SimpleInputBuffer buffer) throws IOException
    {
       if (mapper == null) {
-         consume(contentDecoder);
-         return;
+         buffer.shutdown();
+         return null;
       }
 
-      DecoderInputStream decoderInputStream = new DecoderInputStream(contentDecoder);
-      try {
-         obj = mapper.readValue(decoderInputStream, type);
-      } finally {
-         decoderInputStream.close();
-      }
-   }
-
-   @Override
-   protected void onEntityEnclosed(HttpEntity entity, ContentType contentType) throws IOException
-   {
-      //
+      return mapper.readValue(new ContentInputStream(buffer), type);
    }
 
    @Override
    protected void onResponseReceived(HttpResponse httpResponse) throws HttpException, IOException
    {
-      response = new Response(httpResponse);
+      Response response = new Response(httpResponse);
 
       if (response.isError()) {
          errorHandler.onError(response);
@@ -87,27 +73,17 @@ public class MapperConsumer<T> extends AbstractAsyncResponseConsumer<T>
       }
 
       String mime = MimeResolver.resolve(httpResponse);
-      this.mapper = Registry.lookupMapper(mime);
+      this.mapper = Registry.lookupMapper(namespace, mime);
+
+      if (mapper == null) {
+         LOGGER.warn("Mapper not found for response {}. Consuming quietly.", httpResponse);
+      }
    }
 
    @Override
    protected void releaseResources()
    {
       this.mapper = null;
-      this.response = null;
-      this.obj = null;
-   }
-
-   private void consume(ContentDecoder contentDecoder) throws IOException
-   {
-      ByteBuffer bbuf = ByteBuffer.allocate(8192);
-      while (true) {
-         int bytesRead = contentDecoder.read(bbuf);
-         if (bytesRead <= 0) {
-            return;
-         }
-         bbuf.clear();
-      }
    }
 
 }

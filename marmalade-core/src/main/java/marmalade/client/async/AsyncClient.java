@@ -12,6 +12,10 @@ import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer;
 import org.apache.http.protocol.HttpContext;
 
+/**
+ * Interface for Marmalade asynchronous clients.
+ * 
+ */
 public interface AsyncClient extends Client
 {
 
@@ -32,14 +36,28 @@ public interface AsyncClient extends Client
    Future<Response> execute(HttpUriRequest request, HttpContext context, FutureCallback<Response> futureCallback);
 
    <T> Future<T> map(HttpUriRequest request, Class<T> type);
-   
+
    <T> Future<T> map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler);
 
    <T> Future<T> map(HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback, ErrorHandler errorHandler);
 
    <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, ErrorHandler errorHandler);
 
-   <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, FutureCallback<T> futureCallback, ErrorHandler errorHandler);
+   <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, FutureCallback<T> futureCallback,
+         ErrorHandler errorHandler);
+
+   <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type);
+
+   <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler);
+
+   <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
+         ErrorHandler errorHandler);
+
+   <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
+         ErrorHandler errorHandler);
+
+   <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
+         FutureCallback<T> futureCallback, ErrorHandler errorHandler);
 
    AsyncClient reset();
 

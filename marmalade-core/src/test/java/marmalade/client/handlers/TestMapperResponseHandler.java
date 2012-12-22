@@ -31,7 +31,7 @@ public class TestMapperResponseHandler
       Assert.assertEquals(mrh.handleResponse(response).hi, 1);
    }
 
-   @Test(expectedExceptions = MarmaladeException.class, expectedExceptionsMessageRegExp = "Unable to resolve mapper for type text/plain")
+   @Test(expectedExceptions = MarmaladeException.class, expectedExceptionsMessageRegExp = "Unable to resolve mapper for type 'text/plain' in namespace 'default'")
    public void handleDefaultMime() throws IOException
    {
       HttpResponse response = Mockito.mock(HttpResponse.class);

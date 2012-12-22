@@ -6,7 +6,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import marmalade.util.RequestUtils;
+import marmalade.util.RequestUtil;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -115,7 +115,7 @@ public class SerializableRequest implements Serializable
    {
       // TODO handle multipart
       try {
-         HttpEntity entity = RequestUtils.getEntity(request);
+         HttpEntity entity = RequestUtil.getEntity(request);
 
          if (entity != null) {
             copyEntity(entity);

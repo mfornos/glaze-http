@@ -1,6 +1,6 @@
 package marmalade.scala.spi
 
-import marmalade.spi.HookContrib
+import marmalade.spi.HookProvider
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
  * Registers {@link DefaultScalaModule} on every mapper.
  *
  */
-class ScalaModuleHook extends HookContrib {
+class ScalaModuleHook extends HookProvider {
 
   override def acceptMapper(mime: String): Boolean = true
 

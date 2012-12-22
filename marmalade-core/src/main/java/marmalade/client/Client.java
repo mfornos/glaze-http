@@ -7,6 +7,10 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CookieStore;
 
+/**
+ * Common interface for Marmalade clients.
+ * 
+ */
 public interface Client
 {
 
@@ -26,6 +30,8 @@ public interface Client
    Client auth(final String username, final String password, final String workstation, final String domain);
 
    Client authPreemptive(final HttpHost host);
+   
+   Client authPreemptive(final String schemeName);
 
    Client authPreemptiveProxy(final HttpHost host);
 

@@ -1,5 +1,6 @@
 package marmalade.spi;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -15,8 +16,10 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
@@ -68,62 +71,265 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 public class Registry
 {
 
-   private static final ServiceLoader<HookContrib> hookContribs = ServiceLoader.load(HookContrib.class);
+   private static final RegistryShutdownHook REGISTRY_SHUTDOWN_HOOK = new RegistryShutdownHook();
 
-   private static final ServiceLoader<ServiceContrib> serviceContribs = ServiceLoader.load(ServiceContrib.class);
+   public static final String NS_DEFAULT = "default";
 
-   private static final ServiceLoader<MapperContrib> mapperContribs = ServiceLoader.load(MapperContrib.class);
+   private final static ServiceLoader<HookProvider> hookContribs = ServiceLoader.load(HookProvider.class);;
+
+   @SuppressWarnings("rawtypes")
+   private final static ServiceLoader<ServiceProvider> serviceContribs = ServiceLoader.load(ServiceProvider.class);
+
+   private final static ServiceLoader<MapperProvider> mapperContribs = ServiceLoader.load(MapperProvider.class);
 
    private static final Logger LOGGER = LoggerFactory.getLogger(Registry.class);
 
-   private static final Registry instance = new Registry();
+   private static final Map<String, Registry> instances = new HashMap<String, Registry>();
 
-   private static Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+   private final Map<Class<?>, Object> services;
 
-   private static Map<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>();
+   private final Map<String, ObjectMapper> mappers;
+
+   private final String namespace;
 
    static {
-      instance.initialize();
+      synchronized (instances) {
+         initialize();
+      }
+   }
+
+   public static Registry defaultedInstance(String namespace)
+   {
+      return instances.containsKey(namespace) ? instances.get(namespace) : instance();
    }
 
    public static Registry instance()
    {
-      return instance;
+      return instances.get(NS_DEFAULT);
+   }
+
+   public static Registry instance(String namespace)
+   {
+      return instances.get(namespace);
+   }
+
+   public static Collection<Registry> instances()
+   {
+      return instances.values();
    }
 
    public static boolean isRegitered(Class<?> type)
    {
-      return services.containsKey(type);
+      return isRegitered(NS_DEFAULT, type);
+   }
+
+   public static boolean isRegitered(String namespace, Class<?> type)
+   {
+      return instance(namespace).services.containsKey(type);
+   }
+
+   public static <T> T lookup(Class<T> type)
+   {
+      return lookup(NS_DEFAULT, type);
    }
 
    @SuppressWarnings("unchecked")
-   public static <T> T lookup(Class<T> type)
+   public static <T> T lookup(String namespace, Class<T> type)
    {
-      Object service = services.get(type);
+      Object service = instance(namespace).services.get(type);
       if (service == null) {
-         throw new MarmaladeException(String.format("Service '%s' not found.\n%s", type, instance));
+         throw new MarmaladeException(String.format("Service '%s' not found.\n%s", type, instance(namespace)));
       }
       return (T) service;
    }
 
    public static ObjectMapper lookupMapper(ContentType type)
    {
-      return mappers.get(type.getMimeType());
+      return lookupMapper(NS_DEFAULT, type.getMimeType());
    }
 
    public static ObjectMapper lookupMapper(String contentType)
    {
-      return lookupMapper(ContentType.parse(contentType));
+      return lookupMapper(NS_DEFAULT, contentType);
    }
 
-   private Registry()
+   public static ObjectMapper lookupMapper(String namespace, ContentType type)
+   {
+      ObjectMapper mapper = instance(namespace).mappers.get(type.getMimeType());
+      return mapper == null ? instance().mappers.get(type.getMimeType()) : mapper;
+   }
+
+   public static ObjectMapper lookupMapper(String namespace, String contentType)
+   {
+      return lookupMapper(namespace, ContentType.parse(contentType));
+   }
+
+   static Registry getOrCreate(Object contrib)
+   {
+      Named named = contrib.getClass().getAnnotation(Named.class);
+      Registry registry = named == null ? instance() : instance(named.value());
+      if (registry == null && named != null) {
+         LOGGER.info("Creating registry for namespace: '{}'", named.value());
+         registry = new Registry(named.value());
+         instances.put(named.value(), registry);
+      }
+      return registry;
+   }
+
+   static void reset()
+   {
+      synchronized (instances) {
+         instances.clear();
+      }
+      initialize();
+   }
+
+   private static void fallbackRegisterService(Class<?> type, Callable<?> load)
+   {
+      Registry defaultRegistry = instance();
+
+      Object impl = defaultRegistry.services.get(type);
+
+      if (impl == null) {
+         try {
+            impl = load.call();
+         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+         }
+      }
+
+      defaultRegistry.register(type, impl);
+   }
+
+   private static void initialize()
+   {
+      if (!instances.containsKey(NS_DEFAULT)) {
+         Registry defaultInstance = new Registry(NS_DEFAULT);
+         instances.put(NS_DEFAULT, defaultInstance);
+
+         Runtime.getRuntime().removeShutdownHook(REGISTRY_SHUTDOWN_HOOK);
+         Runtime.getRuntime().addShutdownHook(REGISTRY_SHUTDOWN_HOOK);
+
+         registerServices();
+         registerMappers();
+         registerHooks();
+
+         logInstancesState();
+      }
+   }
+
+   private static void logInstancesState()
+   {
+      for (Registry registry : instances.values()) {
+         registry.logState();
+      }
+   }
+
+   private static void registerHooks()
+   {
+      // TODO advise hooks on registration?
+      for (HookProvider hook : hookContribs) {
+         Registry registry = getOrCreate(hook);
+
+         for (Map.Entry<Class<?>, Object> entry : registry.services.entrySet()) {
+            if (hook.acceptService(entry.getKey())) {
+               hook.visitService(entry.getKey(), entry.getValue());
+            }
+         }
+         for (Map.Entry<String, ObjectMapper> entry : registry.mappers.entrySet()) {
+            if (hook.acceptMapper(entry.getKey())) {
+               hook.visitMapper(entry.getKey(), entry.getValue());
+            }
+         }
+      }
+   }
+
+   private static void registerMappers()
    {
 
+      // Register mapper contribs
+      for (MapperProvider contrib : mapperContribs) {
+         Registry registry = getOrCreate(contrib);
+         registry.registerMapper(contrib.mimeType(), contrib.mapper());
+      }
+
+      Registry defaultRegistry = instance();
+
+      // Assure that mappers for JSON and XML are available
+      if (!defaultRegistry.isMapperRegistered(ContentType.APPLICATION_JSON)) {
+         ObjectMapper mapper = new ObjectMapper();
+         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+         mapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+         mapper.setSerializationInclusion(Include.NON_NULL);
+         mapper.registerModule(new AfterburnerModule());
+         defaultRegistry.registerMapper(ContentType.APPLICATION_JSON, mapper);
+      }
+
+      if (!defaultRegistry.isMapperRegistered(ContentType.APPLICATION_XML)) {
+         JacksonXmlModule module = new JacksonXmlModule();
+         module.setDefaultUseWrapper(false);
+         XmlMapper mapper = new XmlMapper(module);
+         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+         defaultRegistry.registerMapper(ContentType.APPLICATION_XML, mapper);
+      }
+
+   }
+
+   private static void registerServices()
+   {
+      for (ServiceProvider<?> contrib : serviceContribs) {
+         Registry registry = getOrCreate(contrib);
+         registry.register(contrib.serviceClass(), contrib.serviceImpl());
+      }
+
+      // Fallbacks
+
+      fallbackRegisterService(SyncClient.class, new Callable<SyncClient>()
+      {
+         @Override
+         public SyncClient call()
+         {
+            return new DefaultSyncClient();
+         }
+      });
+
+      fallbackRegisterService(AsyncClient.class, new Callable<AsyncClient>()
+      {
+         @Override
+         public AsyncClient call()
+         {
+            return new DefaultAsyncClient();
+         }
+      });
+
+      // Default mapper for conversions &c.
+      fallbackRegisterService(ObjectMapper.class, new Callable<ObjectMapper>()
+      {
+         @Override
+         public ObjectMapper call()
+         {
+            return new ObjectMapper();
+         }
+      });
+   }
+
+   private Registry(String namespace)
+   {
+      this.namespace = namespace;
+      this.services = new HashMap<Class<?>, Object>();
+      this.mappers = new HashMap<String, ObjectMapper>();
    }
 
    public boolean isMapperRegistered(ContentType type)
    {
       return mappers.containsKey(type.getMimeType());
+   }
+
+   public String namespace()
+   {
+      return namespace;
    }
 
    public void register(Class<?> serviceClass, Object serviceImpl)
@@ -171,102 +377,26 @@ public class Registry
       }
    }
 
-   protected void reset()
+   void logState()
    {
-      synchronized (services) {
-         services.clear();
-      }
-      initialize();
-   }
-
-   protected Map<Class<?>, Object> services()
-   {
-      return services;
-   }
-
-   private void fallbackRegisterService(Class<?> type, Callable<?> load)
-   {
-      Object impl = locateServiceContrib(type);
-
-      if (impl == null) {
-         try {
-            impl = load.call();
-         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-         }
-      }
-
-      register(type, impl);
-   }
-
-   private void initialize()
-   {
-
-      Runtime.getRuntime().addShutdownHook(new RegistryShutdownHook());
-
-      fallbackRegisterService(SyncClient.class, new Callable<SyncClient>()
-      {
-         @Override
-         public SyncClient call()
-         {
-            return new DefaultSyncClient();
-         }
-      });
-
-      fallbackRegisterService(AsyncClient.class, new Callable<AsyncClient>()
-      {
-         @Override
-         public AsyncClient call()
-         {
-            return new DefaultAsyncClient();
-         }
-      });
-
-      registerServices();
-      registerMappers();
-
-      // TODO advise hooks on registration?
-      for (HookContrib hook : hookContribs) {
-
-         for (Map.Entry<Class<?>, Object> entry : services.entrySet()) {
-            if (hook.acceptService(entry.getKey())) {
-               hook.visitService(entry.getKey(), entry.getValue());
-            }
-         }
-         for (Map.Entry<String, ObjectMapper> entry : mappers.entrySet()) {
-            if (hook.acceptMapper(entry.getKey())) {
-               hook.visitMapper(entry.getKey(), entry.getValue());
-            }
-         }
-
-      }
-
-      logState();
-   }
-
-   private ServiceContrib locateServiceContrib(Class<?> type)
-   {
-      for (ServiceContrib contrib : serviceContribs) {
-         if (type.equals(contrib.serviceClass())) {
-            return contrib;
-         }
-      }
-      return null;
-   }
-
-   private void logState()
-   {
-
       String title = "Marmalade Registry";
       StringBuilder msg = new StringBuilder("\n");
       msg.append(title);
       msg.append("\n");
       msg.append(new String(new char[title.length()]).replace("\0", "="));
-      msg.append("\nServices:\n");
+      msg.append("\nNamespace: '");
+      msg.append(namespace);
+      msg.append("'\n\nServices:\n");
+      if (services.isEmpty()) {
+         msg.append("* [Empty]\n");
+      }
       for (Map.Entry<Class<?>, Object> entry : services.entrySet()) {
          msg.append(String.format("* %s => %s\n", entry.getKey().getSimpleName(), entry.getValue().getClass()));
       }
       msg.append("\nMappers:\n");
+      if (mappers.isEmpty()) {
+         msg.append("* [Empty]\n");
+      }
       for (String mtype : mappers.keySet()) {
          msg.append(String.format("* %s\n", mtype));
       }
@@ -275,46 +405,9 @@ public class Registry
       LOGGER.info(msg.toString());
    }
 
-   private void registerMappers()
+   protected Map<Class<?>, Object> services()
    {
-
-      // Default mapper for conversions &c.
-      fallbackRegisterService(ObjectMapper.class, new Callable<ObjectMapper>()
-      {
-         @Override
-         public ObjectMapper call()
-         {
-            return new ObjectMapper();
-         }
-      });
-
-      // Register mapper contribs
-      for (MapperContrib contrib : mapperContribs) {
-         registerMapper(contrib.mimeType(), contrib.mapper());
-      }
-
-      // Assure that mappers for JSON and XML are available
-      if (!isMapperRegistered(ContentType.APPLICATION_JSON)) {
-         ObjectMapper objectMapper = new ObjectMapper();
-         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-         objectMapper.registerModule(new AfterburnerModule());
-         registerMapper(ContentType.APPLICATION_JSON, objectMapper);
-      }
-
-      if (!isMapperRegistered(ContentType.APPLICATION_XML)) {
-         JacksonXmlModule module = new JacksonXmlModule();
-         module.setDefaultUseWrapper(false);
-         XmlMapper xmlMapper = new XmlMapper(module);
-         registerMapper(ContentType.APPLICATION_XML, xmlMapper);
-      }
-
-   }
-
-   private void registerServices()
-   {
-      for (ServiceContrib contrib : serviceContribs) {
-         register(contrib.serviceClass(), contrib.serviceImpl());
-      }
+      return services;
    }
 
 }

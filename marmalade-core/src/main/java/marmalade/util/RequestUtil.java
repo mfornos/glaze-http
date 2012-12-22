@@ -5,7 +5,7 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public class RequestUtils
+public class RequestUtil
 {
 
    public static HttpEntity getEntity(HttpRequestBase request)

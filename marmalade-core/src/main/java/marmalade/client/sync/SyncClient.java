@@ -13,7 +13,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.protocol.HttpContext;
 
 /**
- * Contract for execution and mapping of requests.
+ * Interface for Marmalade synchronous clients.
  * 
  */
 public interface SyncClient extends Client
@@ -100,6 +100,40 @@ public interface SyncClient extends Client
     * @return
     */
    <T> T map(HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType);
+
+   /**
+    * @param request
+    * @param type
+    * @return
+    */
+   <T> T map(String namespace, HttpUriRequest request, Class<T> type);
+
+   /**
+    * @param request
+    * @param type
+    * @param forceType
+    * @return
+    */
+   <T> T map(String namespace, HttpUriRequest request, Class<T> type, ContentType forceType);
+
+   <T> T map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler);
+
+   /**
+    * @param request
+    * @param context
+    * @param type
+    * @return
+    */
+   <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type);
+
+   /**
+    * @param request
+    * @param context
+    * @param type
+    * @param forceType
+    * @return
+    */
+   <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType);
 
    /**
     * Specifies the authorization chain.

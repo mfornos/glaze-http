@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 
 import marmalade.spi.Registry;
 
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 
 public class EntityMapper
 {
@@ -23,13 +25,13 @@ public class EntityMapper
 
       UrlEncodedMap {
          @Override
-         boolean accept(Object bean, ContentType type)
+         boolean accept(String ns, Object bean, ContentType type)
          {
             return ContentType.APPLICATION_FORM_URLENCODED.getMimeType().equals(type.getMimeType());
          }
 
          @Override
-         HttpEntity map(Object bean, ContentType type)
+         HttpEntity map(String ns, Object bean, ContentType type)
          {
             return FormHelper.asUrlEncodedFormEntity(bean);
          }
@@ -38,13 +40,13 @@ public class EntityMapper
 
       MultipartMap {
          @Override
-         boolean accept(Object bean, ContentType type)
+         boolean accept(String ns, Object bean, ContentType type)
          {
             return ContentType.MULTIPART_FORM_DATA.getMimeType().equals(type.getMimeType());
          }
 
          @Override
-         HttpEntity map(Object bean, ContentType type)
+         HttpEntity map(String ns, Object bean, ContentType type)
          {
             return FormHelper.asMultipartEntity(bean);
          }
@@ -52,16 +54,16 @@ public class EntityMapper
 
       ObjectMapperMap {
          @Override
-         boolean accept(Object bean, ContentType type)
+         boolean accept(String ns, Object bean, ContentType type)
          {
-            ObjectMapper mapper = Registry.lookupMapper(type);
+            ObjectMapper mapper = Registry.lookupMapper(ns, type);
             return mapper != null && mapper.canSerialize(bean.getClass());
          }
 
          @Override
-         HttpEntity map(Object bean, ContentType type)
+         HttpEntity map(String ns, Object bean, ContentType type)
          {
-            ObjectMapper mapper = Registry.lookupMapper(type);
+            ObjectMapper mapper = Registry.lookupMapper(ns, type);
             CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
             OutputStream out = cbb.getOutputStream();
             try {
@@ -81,27 +83,54 @@ public class EntityMapper
                }
             }
          }
+
+         @Override
+         HttpEntity repeatableMap(String ns, Object bean, ContentType type)
+         {
+
+            ObjectMapper mapper = Registry.lookupMapper(ns, type);
+
+            StringWriter writer = new StringWriter();
+            try {
+               mapper.writeValue(writer, bean);
+            } catch (IOException e) {
+               LOGGER.error(e.getMessage(), e);
+            } finally {
+               try {
+                  writer.close();
+               } catch (IOException e) {
+                  LOGGER.error(e.getMessage(), e);
+               }
+            }
+
+            return new StringEntity(writer.toString(), type);
+         }
       },
 
       // Always keep fall-back last
       Fallback {
          @Override
-         boolean accept(Object bean, ContentType type)
+         boolean accept(String ns, Object bean, ContentType type)
          {
             return true;
          }
 
          @Override
-         HttpEntity map(Object bean, ContentType type)
+         HttpEntity map(String ns, Object bean, ContentType type)
          {
             return new StringEntity(bean.toString(), type);
          }
 
       };
 
-      abstract boolean accept(Object bean, ContentType type);
+      abstract boolean accept(String ns, Object bean, ContentType type);
 
-      abstract HttpEntity map(Object bean, ContentType type);
+      abstract HttpEntity map(String ns, Object bean, ContentType type);
+
+      HttpEntity repeatableMap(String ns, Object bean, ContentType type)
+      {
+         return map(null, bean, type);
+      }
 
    }
 
@@ -109,9 +138,15 @@ public class EntityMapper
 
    public static HttpEntity map(Object bean, ContentType type)
    {
+      return map(Registry.NS_DEFAULT, bean, type, false);
+   }
+
+   public static HttpEntity map(String namespace, Object bean, ContentType type, boolean repeatable)
+   {
+      String ns = Optional.fromNullable(namespace).or(Registry.NS_DEFAULT);
       for (Maps m : Maps.values()) {
-         if (m.accept(bean, type)) {
-            return m.map(bean, type);
+         if (m.accept(ns, bean, type)) {
+            return repeatable ? m.repeatableMap(ns, bean, type) : m.map(ns, bean, type);
          }
       }
       return new StringEntity(bean.toString(), type);

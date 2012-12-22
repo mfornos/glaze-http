@@ -5,10 +5,12 @@ import java.util.Arrays;
 
 import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
+import marmalade.client.Client;
 import marmalade.client.Response;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.handlers.ErrorResponseHandler;
 import marmalade.client.handlers.MapperResponseHandler;
+import marmalade.client.interceptors.PreemptiveAuthorizer;
 import marmalade.spi.Registry;
 
 import org.apache.http.auth.params.AuthPNames;
@@ -76,6 +78,14 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    {
       super();
       this.httpClient = httpClient;
+   }
+
+   @Override
+   public Client authPreemptive(String schemeName)
+   {
+      DefaultHttpClient httpClient = (DefaultHttpClient) getHttpClient();
+      httpClient.addRequestInterceptor(new PreemptiveAuthorizer(schemeName), 0);
+      return this;
    }
 
    /*
@@ -172,6 +182,36 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       return httpClient;
    }
 
+   @Override
+   public <T> T map(HttpUriRequest request, Class<T> type)
+   {
+      return map(Registry.NS_DEFAULT, request, type);
+   }
+
+   @Override
+   public <T> T map(HttpUriRequest request, Class<T> type, ContentType forceType)
+   {
+      return map(Registry.NS_DEFAULT, request, type, forceType);
+   }
+
+   @Override
+   public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   {
+      return map(Registry.NS_DEFAULT, request, type, errorHandler);
+   }
+
+   @Override
+   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type)
+   {
+      return map(Registry.NS_DEFAULT, request, context, type);
+   }
+
+   @Override
+   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType)
+   {
+      return map(Registry.NS_DEFAULT, request, context, type, forceType);
+   }
+
    /*
     * (non-Javadoc)
     * 
@@ -180,9 +220,9 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
     * , java.lang.Class)
     */
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type)
+   public <T> T map(String namespace, HttpUriRequest request, Class<T> type)
    {
-      return execute(request, new MapperResponseHandler<T>(type));
+      return execute(request, new MapperResponseHandler<T>(namespace, type));
    }
 
    /*
@@ -193,9 +233,9 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
     * , java.lang.Class, org.apache.http.entity.ContentType)
     */
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type, ContentType forceType)
+   public <T> T map(String namespace, HttpUriRequest request, Class<T> type, ContentType forceType)
    {
-      return execute(request, new MapperResponseHandler<T>(type, forceType));
+      return execute(request, new MapperResponseHandler<T>(namespace, type, forceType));
    }
 
    /*
@@ -205,9 +245,9 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
     * HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
     */
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   public <T> T map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
    {
-      return execute(request, new MapperResponseHandler<T>(type, errorHandler));
+      return execute(request, new MapperResponseHandler<T>(namespace, type, errorHandler));
    }
 
    /*
@@ -218,9 +258,9 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
     * , org.apache.http.protocol.HttpContext, java.lang.Class)
     */
    @Override
-   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type)
+   public <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type)
    {
-      return execute(request, new MapperResponseHandler<T>(type), context);
+      return execute(request, new MapperResponseHandler<T>(namespace, type), context);
    }
 
    /*
@@ -232,7 +272,7 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
     * org.apache.http.entity.ContentType)
     */
    @Override
-   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType)
+   public <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType)
    {
       return execute(request, new MapperResponseHandler<T>(type, forceType), context);
    }
