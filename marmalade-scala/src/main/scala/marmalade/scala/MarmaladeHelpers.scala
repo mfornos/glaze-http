@@ -9,6 +9,8 @@ import org.apache.http.client.ResponseHandler
 import marmalade.client.Response
 import marmalade.client.handlers.DefaultResponseHandler
 
+// TODO see https://github.com/jsuereth/scala-arm
+// Automatic-Resource-Management (endAsync, etc)
 trait MarmaladeHelpers {
 
   class ErrorHandlerWrap(e: Response => Unit)

@@ -3,6 +3,7 @@ package marmalade.client;
 import marmalade.Marmalade;
 import marmalade.client.sync.DefaultSyncClient;
 import marmalade.client.sync.SyncClient;
+import marmalade.client.sync.SyncMap;
 import marmalade.test.data.Member;
 import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
@@ -45,7 +46,7 @@ public class TestClient extends BaseHttpTest
    {
       server.expect(Condition.when("GET").respond("{\"id\":\"abcd\"}", ContentType.APPLICATION_JSON));
 
-      Member member = client.map(new HttpGet(baseUrl + "/"), Member.class);
+      Member member = client.map(new SyncMap<Member>(new HttpGet(baseUrl + "/"), Member.class));
       Assert.assertEquals(member.id, "abcd");
    }
 

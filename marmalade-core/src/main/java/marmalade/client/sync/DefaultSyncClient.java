@@ -9,10 +9,11 @@ import marmalade.client.Client;
 import marmalade.client.Response;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.handlers.ErrorResponseHandler;
-import marmalade.client.handlers.MapperResponseHandler;
 import marmalade.client.interceptors.PreemptiveAuthorizer;
 import marmalade.spi.Registry;
 
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -21,7 +22,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
@@ -183,98 +184,38 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    }
 
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type)
+   public Client interceptRequest(HttpRequestInterceptor interceptor)
    {
-      return map(Registry.NS_DEFAULT, request, type);
+      ((AbstractHttpClient) getHttpClient()).addRequestInterceptor(interceptor);
+      return this;
    }
 
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type, ContentType forceType)
+   public Client interceptRequest(HttpRequestInterceptor interceptor, int position)
    {
-      return map(Registry.NS_DEFAULT, request, type, forceType);
+      ((AbstractHttpClient) getHttpClient()).addRequestInterceptor(interceptor, position);
+      return this;
    }
 
    @Override
-   public <T> T map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   public Client interceptResponse(HttpResponseInterceptor interceptor)
    {
-      return map(Registry.NS_DEFAULT, request, type, errorHandler);
+      ((AbstractHttpClient) getHttpClient()).addResponseInterceptor(interceptor);
+      return this;
    }
 
    @Override
-   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type)
+   public Client interceptResponse(HttpResponseInterceptor interceptor, int position)
    {
-      return map(Registry.NS_DEFAULT, request, context, type);
+      ((AbstractHttpClient) getHttpClient()).addResponseInterceptor(interceptor, position);
+      return this;
    }
 
    @Override
-   public <T> T map(HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType)
+   public <T> T map(SyncMap<T> mapRequest)
    {
-      return map(Registry.NS_DEFAULT, request, context, type, forceType);
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * marmalade.client.SyncClient#map(org.apache.http.client.methods.HttpUriRequest
-    * , java.lang.Class)
-    */
-   @Override
-   public <T> T map(String namespace, HttpUriRequest request, Class<T> type)
-   {
-      return execute(request, new MapperResponseHandler<T>(namespace, type));
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * marmalade.client.SyncClient#map(org.apache.http.client.methods.HttpUriRequest
-    * , java.lang.Class, org.apache.http.entity.ContentType)
-    */
-   @Override
-   public <T> T map(String namespace, HttpUriRequest request, Class<T> type, ContentType forceType)
-   {
-      return execute(request, new MapperResponseHandler<T>(namespace, type, forceType));
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.sync.SyncClient#map(org.apache.http.client.methods.
-    * HttpUriRequest, java.lang.Class, marmalade.client.handlers.ErrorHandler)
-    */
-   @Override
-   public <T> T map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
-   {
-      return execute(request, new MapperResponseHandler<T>(namespace, type, errorHandler));
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * marmalade.client.SyncClient#map(org.apache.http.client.methods.HttpUriRequest
-    * , org.apache.http.protocol.HttpContext, java.lang.Class)
-    */
-   @Override
-   public <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type)
-   {
-      return execute(request, new MapperResponseHandler<T>(namespace, type), context);
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * marmalade.client.SyncClient#map(org.apache.http.client.methods.HttpUriRequest
-    * , org.apache.http.protocol.HttpContext, java.lang.Class,
-    * org.apache.http.entity.ContentType)
-    */
-   @Override
-   public <T> T map(String namespace, HttpUriRequest request, HttpContext context, Class<T> type, ContentType forceType)
-   {
-      return execute(request, new MapperResponseHandler<T>(type, forceType), context);
+      HttpContext context = mapRequest.hasContext() ? mapRequest.getContext() : prepareLocalContext();
+      return execute(mapRequest.getRequest(), mapRequest.getHandler(), context);
    }
 
    /*
@@ -339,5 +280,4 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    {
       httpClient.getConnectionManager().getSchemeRegistry().unregister(name);
    }
-
 }

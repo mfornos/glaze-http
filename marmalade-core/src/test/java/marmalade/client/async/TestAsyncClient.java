@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import marmalade.client.Response;
+import marmalade.spi.Registry;
 import marmalade.test.data.Member;
 import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
@@ -93,7 +94,7 @@ public class TestAsyncClient extends BaseHttpTest
 
       DefaultAsyncClient client = new DefaultAsyncClient();
       try {
-         Assert.assertEquals(client.map(new HttpGet(baseUrl + "/"), Member.class).get().id, "hello");
+         Assert.assertEquals(client.map(new AsyncMap<Member>(Registry.NS_DEFAULT, new HttpGet(baseUrl + "/"), Member.class, null)).get().id, "hello");
       } finally {
          client.shutdown();
       }

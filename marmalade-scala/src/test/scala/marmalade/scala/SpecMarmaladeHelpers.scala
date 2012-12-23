@@ -66,7 +66,7 @@ class SpecMarmaladeHelpers extends HttpSpec {
   "Stream request" should "receive 'Michael bytes'" in withHttpServer { server =>
     server.expect(when("GET").path("/").respond("Michael bytes", TEXT_PLAIN))
 
-    val response = Get(baseUri).stream(new AsyncByteConsumer[String] {
+    val response = Get(baseUri).withConsumer(new AsyncByteConsumer[String] {
       var ok = ""
 
       override def onByteReceived(bytes: ByteBuffer, control: IOControl) = {
@@ -78,7 +78,7 @@ class SpecMarmaladeHelpers extends HttpSpec {
       override def buildResult(ctx: HttpContext): String = ok
 
       override def onResponseReceived(response: HttpResponse) = {}
-    })
+    }).executeAsync[String]
 
     assert(response.get === "Michael bytes")
 

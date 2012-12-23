@@ -1,6 +1,7 @@
 package marmalade;
 
-import static marmalade.Marmalade.*;
+import static marmalade.Marmalade.Get;
+import static marmalade.Marmalade.Post;
 import static marmalade.test.http.Condition.when;
 import static marmalade.test.http.Expressions.any;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import marmalade.client.Response;
 import marmalade.client.async.AsyncClient;
 import marmalade.client.async.DefaultAsyncClient;
+import marmalade.spi.Registry;
 import marmalade.test.data.Card;
 import marmalade.test.data.Member;
 import marmalade.test.http.BaseHttpTest;
@@ -79,7 +81,7 @@ public class TestAsync extends BaseHttpTest
          Assert.assertEquals(scott.get().id, "scott");
          Assert.assertEquals(tiger.get().id, "tiger");
       } finally {
-         EndAsync();
+         Registry.lookup(AsyncClient.class).reset();
       }
    }
 
@@ -163,7 +165,7 @@ public class TestAsync extends BaseHttpTest
       server.expect(Condition.when("GET").path("/stream").respond("Michael bytes", ContentType.APPLICATION_JSON));
 
       try {
-         Future<String> ok = Get(baseUrl + "/stream").stream(new AsyncByteConsumer<String>()
+         Future<String> ok = Get(baseUrl + "/stream").withConsumer(new AsyncByteConsumer<String>()
          {
             private String ok;
 
@@ -189,11 +191,11 @@ public class TestAsync extends BaseHttpTest
             {
                //
             }
-         });
+         }).executeAsync();
 
          Assert.assertEquals(ok.get(), "Michael bytes");
       } finally {
-         EndAsync();
+         Registry.lookup(AsyncClient.class).reset();
       }
 
    }

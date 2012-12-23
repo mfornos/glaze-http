@@ -7,7 +7,6 @@ import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
 import marmalade.client.Client;
 import marmalade.client.Response;
-import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.interceptors.PreemptiveAuthorizer;
 import marmalade.spi.Registry;
 import marmalade.util.RequestUtil;
@@ -16,6 +15,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
@@ -23,6 +24,7 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.nio.client.AbstractHttpAsyncClient;
 import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.conn.scheme.AsyncScheme;
@@ -168,68 +170,38 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type)
+   public Client interceptRequest(HttpRequestInterceptor interceptor)
    {
-      return map(Registry.NS_DEFAULT, request, type);
+      ((AbstractHttpAsyncClient) getHttpClient()).addRequestInterceptor(interceptor);
+      return this;
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   public Client interceptRequest(HttpRequestInterceptor interceptor, int position)
    {
-      return map(Registry.NS_DEFAULT, request, type, errorHandler);
+      ((AbstractHttpAsyncClient) getHttpClient()).addRequestInterceptor(interceptor, position);
+      return this;
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
-         ErrorHandler errorHandler)
+   public Client interceptResponse(HttpResponseInterceptor interceptor)
    {
-      return map(Registry.NS_DEFAULT, request, type, futureCallback, errorHandler);
+      ((AbstractHttpAsyncClient) getHttpClient()).addResponseInterceptor(interceptor);
+      return this;
    }
 
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context, ErrorHandler errorHandler)
+   public Client interceptResponse(HttpResponseInterceptor interceptor, int position)
    {
-      return map(Registry.NS_DEFAULT, request, type, context, errorHandler);
+      ((AbstractHttpAsyncClient) getHttpClient()).addResponseInterceptor(interceptor, position);
+      return this;
    }
-
+   
    @Override
-   public <T> Future<T> map(HttpUriRequest request, Class<T> type, HttpContext context,
-         FutureCallback<T> futureCallback, ErrorHandler errorHandler)
+   public <T> Future<T> map(AsyncMap<T> mapRequest)
    {
-      return map(Registry.NS_DEFAULT, request, type, context, futureCallback, errorHandler);
-   }
-
-   @Override
-   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type)
-   {
-      return map(namespace, request, type, null);
-   }
-
-   @Override
-   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
-   {
-      return map(namespace, request, type, prepareLocalContext(), null, errorHandler);
-   }
-
-   @Override
-   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, FutureCallback<T> futureCallback,
-         ErrorHandler errorHandler)
-   {
-      return map(namespace, request, type, prepareLocalContext(), futureCallback, errorHandler);
-   }
-
-   @Override
-   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
-         ErrorHandler errorHandler)
-   {
-      return map(namespace, request, type, context, null, errorHandler);
-   }
-
-   @Override
-   public <T> Future<T> map(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
-         FutureCallback<T> futureCallback, ErrorHandler errorHandler)
-   {
-      return activateIfNeeded().execute(createAsyncProducer(request), new MapperConsumer<T>(namespace, type, errorHandler), context, futureCallback);
+      HttpContext context = mapRequest.hasContext()?mapRequest.getContext():prepareLocalContext();
+      return activateIfNeeded().execute(createAsyncProducer(mapRequest.getRequest()), mapRequest.getConsumer(), context, mapRequest.getFutureCallback());
    }
 
    public void proxyAuthPref(String... authpref)

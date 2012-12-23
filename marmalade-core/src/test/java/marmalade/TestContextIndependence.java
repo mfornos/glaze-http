@@ -1,6 +1,5 @@
 package marmalade;
 
-import static marmalade.Marmalade.EndAsync;
 import static marmalade.Marmalade.Get;
 import static marmalade.test.http.Condition.when;
 import static marmalade.test.http.Expressions.ANY;
@@ -17,6 +16,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import marmalade.client.Response;
+import marmalade.client.async.AsyncClient;
+import marmalade.spi.Registry;
 import marmalade.test.http.BaseHttpTest;
 
 import org.apache.http.client.protocol.ClientContext;
@@ -71,7 +72,7 @@ public class TestContextIndependence extends BaseHttpTest
          }
 
       } finally {
-         EndAsync();
+         Registry.lookup(AsyncClient.class).reset();
       }
    }
 

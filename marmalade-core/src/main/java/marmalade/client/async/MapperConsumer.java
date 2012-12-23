@@ -10,6 +10,7 @@ import marmalade.spi.Registry;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.nio.util.SimpleInputBuffer;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ public class MapperConsumer<T> extends AbstractContentConsumer<T>
 
    private final String namespace;
 
+   private ContentType overrideType;
+
    public MapperConsumer(Class<T> type)
    {
       this(Registry.NS_DEFAULT, type, CroakErrorHandler.instance());
@@ -44,9 +47,15 @@ public class MapperConsumer<T> extends AbstractContentConsumer<T>
 
    public MapperConsumer(String namespace, Class<T> type, ErrorHandler errorHandler)
    {
+      this(namespace, type, errorHandler, null);
+   }
+
+   public MapperConsumer(String namespace, Class<T> type, ErrorHandler errorHandler, ContentType overrideType)
+   {
       Preconditions.checkNotNull(type, "Type must not be null");
 
       this.type = type;
+      this.overrideType = overrideType;
       this.errorHandler = errorHandler == null ? CroakErrorHandler.instance() : errorHandler;
       this.namespace = Optional.fromNullable(namespace).or(Registry.NS_DEFAULT);
    }
@@ -72,7 +81,7 @@ public class MapperConsumer<T> extends AbstractContentConsumer<T>
          return;
       }
 
-      String mime = MimeResolver.resolve(httpResponse);
+      String mime = overrideType == null ? MimeResolver.resolve(httpResponse) : overrideType.getMimeType();
       this.mapper = Registry.lookupMapper(namespace, mime);
 
       if (mapper == null) {

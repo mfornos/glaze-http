@@ -1,3 +1,12 @@
+/*
+ *     __  ___                           __          __   
+ *    /  |/  /___ __________ ___  ____ _/ /___ _____/ /__ 
+ *   / /|_/ / __ `/ ___/ __ `__ \/ __ `/ / __ `/ __  / _ \
+ *  / /  / / /_/ / /  / / / / / / /_/ / / /_/ / /_/ /  __/
+ * /_/  /_/\__,_/_/  /_/ /_/ /_/\__,_/_/\__,_/\__,_/\___/ 
+ * 
+ * HTTP delight.
+ */
 package marmalade;
 
 import java.io.Serializable;
@@ -12,8 +21,10 @@ import java.util.concurrent.Future;
 
 import marmalade.client.Response;
 import marmalade.client.async.AsyncClient;
+import marmalade.client.async.AsyncMap;
 import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.sync.SyncClient;
+import marmalade.client.sync.SyncMap;
 import marmalade.client.wire.tasks.CallableRequest.SerializableResponseCallback;
 import marmalade.client.wire.tasks.MapCall;
 import marmalade.client.wire.tasks.SendCall;
@@ -118,31 +129,25 @@ import com.google.common.base.Preconditions;
  * 
  * <pre>
  * 
- * try {
+ * // Basic send async
  * 
- *    // Basic send async
+ * Future&lt;HttpResponse&gt; out = Get(uri).sendAsync();
+ * out.get();
  * 
- *    Future&lt;HttpResponse&gt; out = Get(uri).sendAsync();
- *    out.get();
+ * // Basic map async
  * 
- *    // Basic map async
+ * Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
+ * out.get();
  * 
- *    Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
- *    out.get();
+ * // Streaming
  * 
- *    // Streaming
+ * Future&lt;MyResult&gt; out = Get(uri).stream(myAsyncConsumer);
+ * out.get();
  * 
- *    Future&lt;MyResult&gt; out = Get(uri).stream(myAsyncConsumer);
- *    out.get();
+ * // With consumer
  * 
- *    // With consumer
- * 
- *    Future&lt;MyResult&gt; out = Get(uri).withConsumer(myAsyncConsumer).executeAsync();
- *    out.get();
- * 
- * } finally {
- *    EndAsync();
- * }
+ * Future&lt;MyResult&gt; out = Get(uri).withConsumer(myAsyncConsumer).executeAsync();
+ * out.get();
  * 
  * </pre>
  * 
@@ -224,14 +229,6 @@ public final class Marmalade
    public static Marmalade Delete(URI uri)
    {
       return new Marmalade(new HttpDelete(uri));
-   }
-
-   /**
-    * 
-    */
-   public static void EndAsync()
-   {
-      Registry.lookup(AsyncClient.class).reset();
    }
 
    /**
@@ -826,7 +823,8 @@ public final class Marmalade
    {
       Preconditions.checkNotNull(asyncConsumer, "Please, specify an asynchronous consumer '.withConsumer(consumer)'.");
 
-      return (Future<T>) stream(client, asyncConsumer);
+      HttpAsyncRequestProducer producer = client.createAsyncProducer(build());
+      return (Future<T>) client.execute(producer, asyncConsumer);
    }
 
    /**
@@ -908,7 +906,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type)
    {
-      return client.map(namespace, build(), type, errorHandler);
+      return client.map(new SyncMap<T>(namespace, build(), type, errorHandler));
    }
 
    /**
@@ -924,7 +922,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, ContentType overrideType)
    {
-      return client.map(namespace, build(), type, overrideType);
+      return client.map(new SyncMap<T>(namespace, build(), type, errorHandler, overrideType));
    }
 
    /**
@@ -940,7 +938,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, HttpContext context)
    {
-      return client.map(namespace, build(), context, type);
+      return client.map(new SyncMap<T>(namespace, build(), type, context, errorHandler));
    }
 
    /**
@@ -958,7 +956,7 @@ public final class Marmalade
     */
    public <T> T map(SyncClient client, Class<T> type, HttpContext context, ContentType overrideType)
    {
-      return client.map(namespace, build(), context, type, overrideType);
+      return client.map(new SyncMap<T>(namespace, build(), type, context, errorHandler, overrideType));
    }
 
    /**
@@ -1000,7 +998,12 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type)
    {
-      return client.map(namespace, build(), type, errorHandler);
+      return client.map(new AsyncMap<T>(namespace, build(), type, errorHandler));
+   }
+
+   public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, ContentType overrideType)
+   {
+      return client.map(new AsyncMap<T>(namespace, build(), type, errorHandler, overrideType));
    }
 
    /**
@@ -1016,7 +1019,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, FutureCallback<T> callback)
    {
-      return client.map(namespace, build(), type, callback, errorHandler);
+      return client.map(new AsyncMap<T>(namespace, build(), type, callback, errorHandler));
    }
 
    /**
@@ -1032,7 +1035,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context)
    {
-      return client.map(namespace, build(), type, context, errorHandler);
+      return client.map(new AsyncMap<T>(namespace, build(), type, context, errorHandler));
    }
 
    /**
@@ -1050,7 +1053,7 @@ public final class Marmalade
     */
    public <T> Future<T> mapAsync(AsyncClient client, Class<T> type, HttpContext context, FutureCallback<T> callback)
    {
-      return client.map(namespace, build(), type, context, callback, errorHandler);
+      return client.map(new AsyncMap<T>(namespace, build(), type, context, callback, errorHandler));
    }
 
    public <T> Future<T> mapAsync(AsyncClient client, TypeReference<T> type)
@@ -1068,6 +1071,11 @@ public final class Marmalade
    public <T> Future<T> mapAsync(Class<T> type)
    {
       return mapAsync(defaultAsyncClient(), type);
+   }
+
+   public <T> Future<T> mapAsync(Class<T> type, ContentType overrideType)
+   {
+      return mapAsync(defaultAsyncClient(), type, overrideType);
    }
 
    /**
@@ -1467,36 +1475,6 @@ public final class Marmalade
    }
 
    /**
-    * Streams the response through an asynchronous consumer.
-    * 
-    * @param client
-    *           The execution client.
-    * @param consumer
-    *           The asynchronous consumer.
-    * @return the future response
-    * @see HttpAsyncResponseConsumer
-    */
-   public <T> Future<T> stream(AsyncClient client, HttpAsyncResponseConsumer<T> consumer)
-   {
-      HttpAsyncRequestProducer producer = client.createAsyncProducer(build());
-      return client.execute(producer, consumer);
-   }
-
-   /**
-    * Executes the current request asynchronously processing the response
-    * through an asynchronous consumer.
-    * 
-    * @param consumer
-    *           The asynchronous consumer.
-    * @return the future response
-    * @see HttpAsyncResponseConsumer
-    */
-   public <T> Future<T> stream(HttpAsyncResponseConsumer<T> consumer)
-   {
-      return stream(defaultAsyncClient(), consumer);
-   }
-
-   /**
     * Activates 'Expect: 100-Continue' handshake for the entity enclosing
     * methods. The 'Expect: 100-Continue' handshake allows a client that is
     * sending a request message with a request body to determine if the origin
@@ -1617,8 +1595,6 @@ public final class Marmalade
    {
       return entity == null && bean != null && RequestUtil.isEnclosingEntity(request) && hasContentType();
    }
-
-   // TODO overrideType for mapAsync
 
    // TODO zero copy multipart
 

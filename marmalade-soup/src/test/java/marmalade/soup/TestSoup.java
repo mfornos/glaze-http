@@ -6,10 +6,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import marmalade.Marmalade;
+import marmalade.client.async.AsyncClient;
 import marmalade.soup.async.SoupConsumer;
 import marmalade.soup.async.SoupSelectConsumer;
 import marmalade.soup.sync.SoupHandler;
 import marmalade.soup.sync.SoupSelectHandler;
+import marmalade.spi.Registry;
 import marmalade.test.http.BaseHttpTest;
 import marmalade.test.http.Condition;
 
@@ -36,13 +38,6 @@ public class TestSoup extends BaseHttpTest
       }
    }
 
-   // @Test
-   // public void w() {
-   // Document doc =
-   // Marmalade.Get("http://elpais.com/tag/rss/francesc_vilanova_i_bayo/a").withHandler(SoupHandler.instance(Mode.XML)).execute();
-   // writeFile("src/test/resources/feed01.xml", doc.toString());
-   // }
-
    @Test
    public void asyncDoc() throws InterruptedException, ExecutionException
    {
@@ -54,7 +49,7 @@ public class TestSoup extends BaseHttpTest
          Assert.assertNotNull(doc);
          Assert.assertEquals(doc.getAllElements().size(), 661);
       } finally {
-         Marmalade.EndAsync();
+         Registry.lookup(AsyncClient.class).reset();
       }
    }
 
@@ -69,7 +64,7 @@ public class TestSoup extends BaseHttpTest
          Assert.assertNotNull(els);
          Assert.assertEquals(els.size(), 25);
       } finally {
-         Marmalade.EndAsync();
+         Registry.lookup(AsyncClient.class).reset();
       }
    }
 

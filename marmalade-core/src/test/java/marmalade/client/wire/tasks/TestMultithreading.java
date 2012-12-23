@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 
 import marmalade.client.Response;
 import marmalade.client.sync.SyncClient;
-import marmalade.client.wire.tasks.CallableRequest;
+import marmalade.client.sync.SyncMap;
 import marmalade.test.data.Member;
 
 import org.apache.http.HttpResponse;
@@ -90,7 +90,7 @@ public class TestMultithreading
          HttpResponse response = mock(HttpResponse.class);
          when(response.getEntity()).thenReturn(new StringEntity("hello", ContentType.DEFAULT_TEXT));
          when(response.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
-         when(client.map(any(HttpUriRequest.class), any(Class.class))).thenReturn(new Member("abcdefg"));
+         when(client.map(any(SyncMap.class))).thenReturn(new Member("abcdefg"));
          when(client.execute(any(HttpUriRequest.class))).thenReturn(new Response(response));
          return wrapped.execute(client, request);
       }

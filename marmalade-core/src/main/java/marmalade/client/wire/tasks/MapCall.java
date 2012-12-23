@@ -3,6 +3,7 @@ package marmalade.client.wire.tasks;
 import java.io.Serializable;
 
 import marmalade.client.sync.SyncClient;
+import marmalade.client.sync.SyncMap;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class MapCall<T extends Serializable> extends CallableRequest<T>
    @Override
    protected T execute(SyncClient client, HttpUriRequest request)
    {
-      return client.map(request, type);
+      return client.map(new SyncMap<T>(request, type));
    }
 
    private SerializableResponseCallback<T> emptyCallback()
