@@ -24,10 +24,6 @@
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <httpclient.version>4.2.1</httpclient.version>
-    <jackson.version>2.1.1</jackson.version>
-    <signpost.version>1.2.1.1</signpost.version>
-    <testng.version>6.8</testng.version>
-    <mockito.version>1.9.0</mockito.version>
     
     <cobertura.version>2.5.2</cobertura.version>
     <javadoc.version>2.9</javadoc.version>
@@ -59,18 +55,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   

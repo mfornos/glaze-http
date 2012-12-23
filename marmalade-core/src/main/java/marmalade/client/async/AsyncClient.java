@@ -4,6 +4,7 @@ import java.util.concurrent.Future;
 
 import marmalade.client.Client;
 import marmalade.client.Response;
+import marmalade.client.handlers.ErrorHandler;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
@@ -28,11 +29,12 @@ public interface AsyncClient extends Client
    <T> Future<T> execute(HttpAsyncRequestProducer producer, HttpAsyncResponseConsumer<T> consumer, HttpContext context,
          FutureCallback<T> futureCallback);
 
-   Future<Response> execute(HttpUriRequest request);
+   Future<Response> execute(HttpUriRequest request, ErrorHandler errorHandler);
 
-   Future<Response> execute(HttpUriRequest request, FutureCallback<Response> futureCallback);
+   Future<Response> execute(HttpUriRequest request, FutureCallback<Response> futureCallback, ErrorHandler errorHandler);
 
-   Future<Response> execute(HttpUriRequest request, HttpContext context, FutureCallback<Response> futureCallback);
+   Future<Response> execute(HttpUriRequest request, HttpContext context, FutureCallback<Response> futureCallback,
+         ErrorHandler errorHandler);
 
    <T> Future<T> map(AsyncMap<T> mapRequest);
 

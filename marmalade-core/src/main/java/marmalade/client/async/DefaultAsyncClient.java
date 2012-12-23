@@ -7,6 +7,7 @@ import marmalade.MarmaladeException;
 import marmalade.client.BaseClient;
 import marmalade.client.Client;
 import marmalade.client.Response;
+import marmalade.client.handlers.ErrorHandler;
 import marmalade.client.interceptors.PreemptiveAuthorizer;
 import marmalade.spi.Registry;
 import marmalade.util.RequestUtil;
@@ -147,21 +148,23 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
    }
 
    @Override
-   public Future<Response> execute(HttpUriRequest request)
+   public Future<Response> execute(HttpUriRequest request, ErrorHandler errorHandler)
    {
-      return execute(request, null);
+      return execute(request, null, errorHandler);
    }
 
    @Override
-   public Future<Response> execute(HttpUriRequest request, FutureCallback<Response> futureCallback)
+   public Future<Response> execute(HttpUriRequest request, FutureCallback<Response> futureCallback,
+         ErrorHandler errorHandler)
    {
-      return execute(request, prepareLocalContext(), futureCallback);
+      return execute(request, prepareLocalContext(), futureCallback, errorHandler);
    }
 
    @Override
-   public Future<Response> execute(HttpUriRequest request, HttpContext context, FutureCallback<Response> futureCallback)
+   public Future<Response> execute(HttpUriRequest request, HttpContext context,
+         FutureCallback<Response> futureCallback, ErrorHandler errorHandler)
    {
-      return activateIfNeeded().execute(createAsyncProducer(request), new ResponseConsumer(), context, futureCallback);
+      return activateIfNeeded().execute(createAsyncProducer(request), new ResponseConsumer(errorHandler), context, futureCallback);
    }
 
    public HttpAsyncClient getHttpClient()
@@ -196,11 +199,11 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
       ((AbstractHttpAsyncClient) getHttpClient()).addResponseInterceptor(interceptor, position);
       return this;
    }
-   
+
    @Override
    public <T> Future<T> map(AsyncMap<T> mapRequest)
    {
-      HttpContext context = mapRequest.hasContext()?mapRequest.getContext():prepareLocalContext();
+      HttpContext context = mapRequest.hasContext() ? mapRequest.getContext() : prepareLocalContext();
       return activateIfNeeded().execute(createAsyncProducer(mapRequest.getRequest()), mapRequest.getConsumer(), context, mapRequest.getFutureCallback());
    }
 

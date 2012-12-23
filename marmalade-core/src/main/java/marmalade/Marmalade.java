@@ -1244,7 +1244,7 @@ public final class Marmalade
     */
    public Future<Response> sendAsync(AsyncClient client)
    {
-      return client.execute(build());
+      return client.execute(build(), errorHandler);
    }
 
    /**
@@ -1258,7 +1258,7 @@ public final class Marmalade
     */
    public Future<Response> sendAsync(AsyncClient client, FutureCallback<Response> callback)
    {
-      return client.execute(build(), callback);
+      return client.execute(build(), callback, errorHandler);
    }
 
    /**
@@ -1272,7 +1272,7 @@ public final class Marmalade
     */
    public Future<Response> sendAsync(AsyncClient client, HttpContext context)
    {
-      return client.execute(build(), context, null);
+      return client.execute(build(), context, null, errorHandler);
    }
 
    /**
@@ -1288,7 +1288,7 @@ public final class Marmalade
     */
    public Future<Response> sendAsync(AsyncClient client, HttpContext context, FutureCallback<Response> callback)
    {
-      return client.execute(build(), context, callback);
+      return client.execute(build(), context, callback, errorHandler);
    }
 
    /**

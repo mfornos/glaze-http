@@ -11,6 +11,8 @@
   <name>Marmalade - Test</name>
   
   <properties>
+    <testng.version>6.8</testng.version>
+    <mockito.version>1.9.0</mockito.version>
     <simple.version>4.1.21</simple.version>
   </properties>
   
@@ -24,6 +26,17 @@
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>${testng.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>${mockito.version}</version>
     </dependency>
   </dependencies>
 </project>

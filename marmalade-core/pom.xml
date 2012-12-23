@@ -15,6 +15,7 @@
     <jackson.version>2.1.1</jackson.version>
     <httpasync.version>4.0-beta3</httpasync.version>
     <guava.version>13.0.1</guava.version>
+    <snakeyaml.version>1.11</snakeyaml.version>
   </properties>
   
   <dependencies>
@@ -42,6 +43,11 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.mfornos</groupId>
