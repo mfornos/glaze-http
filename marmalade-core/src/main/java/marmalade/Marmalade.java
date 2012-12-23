@@ -139,11 +139,6 @@ import com.google.common.base.Preconditions;
  * Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
  * out.get();
  * 
- * // Streaming
- * 
- * Future&lt;MyResult&gt; out = Get(uri).stream(myAsyncConsumer);
- * out.get();
- * 
  * // With consumer
  * 
  * Future&lt;MyResult&gt; out = Get(uri).withConsumer(myAsyncConsumer).executeAsync();
