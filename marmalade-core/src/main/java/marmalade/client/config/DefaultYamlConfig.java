@@ -93,14 +93,16 @@ public class DefaultYamlConfig extends BaseConfig
       try {
          return load(yaml, new FileInputStream(configPath));
       } catch (Exception e) {
-         LOGGER.warn("loading configuration from fs failed for {}={}", getSystemVarName(), configPath);
+         if (LOGGER.isDebugEnabled())
+            LOGGER.debug("loading configuration from fs failed for {}={}", getSystemVarName(), configPath);
       }
 
       // try from classpath
       try {
          return load(yaml, DefaultYamlConfig.class.getClassLoader().getResourceAsStream(configPath));
       } catch (Exception e) {
-         LOGGER.warn("loading configuration from classpath failed for {}={}", getSystemVarName(), configPath);
+         if (LOGGER.isDebugEnabled())
+            LOGGER.debug("loading configuration from classpath failed for {}={}", getSystemVarName(), configPath);
       }
 
       // fallback

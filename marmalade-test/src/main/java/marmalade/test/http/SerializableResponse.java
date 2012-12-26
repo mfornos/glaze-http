@@ -1,15 +1,13 @@
-package marmalade.client.wire.tasks;
+package marmalade.test.http;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import marmalade.client.Response;
-
 import org.apache.http.Header;
-
-import com.google.common.base.Objects;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 
 public class SerializableResponse implements Serializable
 {
@@ -19,13 +17,13 @@ public class SerializableResponse implements Serializable
    private final int status;
    private final Map<String, String> headers;
 
-   public SerializableResponse(Response response)
+   public SerializableResponse(HttpResponse response)
    {
       this.headers = new HashMap<String, String>();
       this.bytes = getBytes(response);
-      this.status = response.status();
+      this.status = response.getStatusLine().getStatusCode();
 
-      Header[] allHeaders = response.getHttpResponse().getAllHeaders();
+      Header[] allHeaders = response.getAllHeaders();
       for (Header h : allHeaders) {
          headers.put(h.getName(), h.getValue());
       }
@@ -51,16 +49,10 @@ public class SerializableResponse implements Serializable
       return status;
    }
 
-   @Override
-   public String toString()
-   {
-      return Objects.toStringHelper(this).add("status", status).add("headers", headers).toString();
-   }
-
-   private byte[] getBytes(Response response)
+   private byte[] getBytes(HttpResponse response)
    {
       try {
-         return response.asBytes();
+         return EntityUtils.toByteArray(response.getEntity());
       } catch (Exception e) {
          return new byte[] {};
       }

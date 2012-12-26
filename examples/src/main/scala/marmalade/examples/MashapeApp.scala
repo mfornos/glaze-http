@@ -33,7 +33,7 @@ object MashapeApp extends MarmaladeHelpers {
 
       println("%s @%s\n".format(where, new Date))
 
-      for (forecast <- forecasts.get) println(forecast)
+      forecasts.get.foreach(forecast => println(forecast))
 
     } finally { mcli.shutdown }
 

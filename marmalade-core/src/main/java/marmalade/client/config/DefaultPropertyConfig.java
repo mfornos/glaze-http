@@ -115,7 +115,8 @@ public class DefaultPropertyConfig extends BaseConfig
          properties.load(new FileInputStream(configPath));
          return;
       } catch (Exception e) {
-         LOGGER.warn("loading configuration from fs failed for {}={}", getSystemVarName(), configPath);
+         if (LOGGER.isDebugEnabled())
+            LOGGER.debug("loading configuration from fs failed for {}={}", getSystemVarName(), configPath);
       }
 
       // try load from classpath
@@ -123,7 +124,8 @@ public class DefaultPropertyConfig extends BaseConfig
          properties.load(DefaultPropertyConfig.class.getClassLoader().getResourceAsStream(configPath));
          return;
       } catch (Exception e) {
-         LOGGER.warn("loading configuration from classpath failed for {}={}", getSystemVarName(), configPath);
+         if (LOGGER.isDebugEnabled())
+            LOGGER.debug("loading configuration from classpath failed for {}={}", getSystemVarName(), configPath);
       }
 
       // fallback

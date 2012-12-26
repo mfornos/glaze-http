@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import marmalade.test.http.Producers.Producer;
+import marmalade.test.http.replay.SerializationUtil;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
@@ -37,15 +38,15 @@ public class ResponseBuilder
       this.headers = new HashMap<String, Producer>();
    }
 
-   public ResponseBuilder and(String key, String value)
-   {
-      return and(key, Producers.id(value));
-   }
-
    public ResponseBuilder and(String key, Producer value)
    {
       this.headers.put(key, value);
       return this;
+   }
+
+   public ResponseBuilder and(String key, String value)
+   {
+      return and(key, Producers.id(value));
    }
 
    public ResponseBuilder body(String content)
@@ -67,6 +68,11 @@ public class ResponseBuilder
    public Condition getRoot()
    {
       return root;
+   }
+
+   public ResponseBuilder replay(String replayPath)
+   {
+      return SerializationUtil.deserialize(this, replayPath);
    }
 
    public ResponseBuilder status(int status)

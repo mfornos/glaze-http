@@ -4,11 +4,6 @@ import java.util.regex.Pattern;
 
 public final class Expressions
 {
-   public static interface Expression
-   {
-      boolean match(String value);
-   }
-
    public static class Eq implements Expression
    {
       private final String expr;
@@ -23,6 +18,11 @@ public final class Expressions
       {
          return expr.equalsIgnoreCase(value);
       }
+   }
+
+   public static interface Expression
+   {
+      boolean match(String value);
    }
 
    public static class Regex implements Expression
@@ -40,9 +40,8 @@ public final class Expressions
          return pattern.matcher(value).matches();
       }
    }
-   
+
    public static Expression ANY = new Regex(".*");
-   
 
    public static Expression any()
    {
@@ -53,7 +52,7 @@ public final class Expressions
    {
       return new Eq(expr);
    }
-   
+
    public static Expression regex(String expr)
    {
       return new Regex(expr);
