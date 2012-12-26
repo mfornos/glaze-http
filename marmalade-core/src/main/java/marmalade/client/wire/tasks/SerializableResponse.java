@@ -25,10 +25,7 @@ public class SerializableResponse implements Serializable
       this.bytes = getBytes(response);
       this.status = response.status();
 
-      Header[] allHeaders = response.getHttpResponse().getAllHeaders();
-      for (Header h : allHeaders) {
-         headers.put(h.getName(), h.getValue());
-      }
+      initHeaders(response);
    }
 
    public String asString()
@@ -63,6 +60,16 @@ public class SerializableResponse implements Serializable
          return response.asBytes();
       } catch (Exception e) {
          return new byte[] {};
+      }
+   }
+
+   private void initHeaders(Response response)
+   {
+      Header[] allHeaders = response.getHttpResponse().getAllHeaders();
+      if (allHeaders != null) {
+         for (Header h : allHeaders) {
+            headers.put(h.getName(), h.getValue());
+         }
       }
    }
 }
