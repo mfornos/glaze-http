@@ -1,6 +1,7 @@
 package marmalade;
 
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 
 import marmalade.client.Response;
@@ -71,5 +72,37 @@ public class TestErrors extends BaseHttpTest
       }).execute();
 
       Assert.assertNull(out);
+   }
+
+   @Test(timeOut = 5000)
+   public void errorsNested()
+   {
+      server.expect(Condition.when("GET").respond(HttpStatus.SC_FORBIDDEN));
+
+      try {
+         Marmalade.Get(baseUrl + "/").map();
+         Assert.fail("Exception not thrown");
+      } catch (ErrorResponseException e) {
+         try {
+            throw new ErrorResponseException(new RuntimeException(e));
+         } catch (ErrorResponseException ne) {
+            Assert.assertEquals(ne.getStatusCode(), HttpStatus.SC_FORBIDDEN);
+         }
+      }
+
+   }
+
+   @Test
+   public void exception()
+   {
+      try {
+         throw new ConcurrentModificationException();
+      } catch (ConcurrentModificationException e) {
+         try {
+            throw new ErrorResponseException(new UnsupportedOperationException(e));
+         } catch (ErrorResponseException ne) {
+            Assert.assertEquals(ne.getStatusCode(), -1);
+         }
+      }
    }
 }

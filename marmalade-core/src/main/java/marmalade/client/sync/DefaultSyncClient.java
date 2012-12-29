@@ -14,6 +14,7 @@ import marmalade.spi.Registry;
 
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.auth.AuthSchemeFactory;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -228,6 +229,12 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
    {
       Preconditions.checkNotNull(authpref, "Please, specify a valid auth policy chain.");
       httpClient.getParams().setParameter(AuthPNames.PROXY_AUTH_PREF, Arrays.asList(authpref));
+   }
+
+   @Override
+   public void registerAuthScheme(String schemeName, AuthSchemeFactory schemeFactory)
+   {
+      ((AbstractHttpClient) httpClient).getAuthSchemes().register(schemeName, schemeFactory);
    }
 
    /*

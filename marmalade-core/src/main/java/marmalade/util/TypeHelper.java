@@ -25,6 +25,11 @@ public final class TypeHelper
       return factory.constructMapType(Map.class, keyClass, valueClass);
    }
 
+   public static TypeReference<Map<String, Object>> plainMap()
+   {
+      return TypeHelper.<String, Object> newMap();
+   }
+
    @SuppressWarnings("unchecked")
    public static final <T> Class<T> resolveClass(TypeReference<T> tref)
    {
@@ -39,11 +44,6 @@ public final class TypeHelper
       }
 
       return clazz;
-   }
-
-   public static TypeReference<Map<String, Object>> plainMap()
-   {
-      return TypeHelper.<String, Object> newMap();
    }
 
 }

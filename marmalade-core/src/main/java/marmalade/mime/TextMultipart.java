@@ -10,10 +10,10 @@ import java.lang.annotation.Target;
 public @interface TextMultipart
 {
 
+   String charset() default "UTF-8";
+
    String mime() default "text/plain";
 
    String name() default "";
-
-   String charset() default "UTF-8";
 
 }

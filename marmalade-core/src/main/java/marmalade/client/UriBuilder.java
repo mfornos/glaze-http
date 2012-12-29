@@ -109,6 +109,11 @@ public class UriBuilder
       return addParameter(name, asList(values));
    }
 
+   public UriBuilder appendPath(Object path)
+   {
+      return appendPath(path.toString());
+   }
+
    /**
     * Append an unencoded path.
     * 
@@ -135,20 +140,18 @@ public class UriBuilder
       return this;
    }
 
-   public UriBuilder appendPath(Object path)
+   public UriBuilder appendPaths(Object... paths)
    {
-      return appendPath(path.toString());
+      for (Object path : paths) {
+         appendPath(path);
+      }
+      return this;
    }
 
    public URI build()
    {
       Preconditions.checkState(scheme != null, "scheme has not been set");
       return URI.create(toString());
-   }
-
-   public URI raw()
-   {
-      return URI.create(toString().substring(7));
    }
 
    public UriBuilder defaultPort()
@@ -169,6 +172,11 @@ public class UriBuilder
       Preconditions.checkArgument(port >= 1 && port <= 65535, "port must be in the range 1-65535");
       this.port = port;
       return this;
+   }
+
+   public URI raw()
+   {
+      return URI.create(toString().substring(7));
    }
 
    public UriBuilder replaceParameter(String name, Iterable<String> values)
@@ -320,13 +328,5 @@ public class UriBuilder
       } catch (CharacterCodingException e) {
          throw new IllegalArgumentException("input does not represent a proper UTF8-encoded string");
       }
-   }
-
-   public UriBuilder appendPaths(Object... paths)
-   {
-      for (Object path : paths) {
-         appendPath(path);
-      }
-      return this;
    }
 }

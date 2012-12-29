@@ -4,13 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.concurrent.Callable;
 
 import marmalade.MarmaladeException;
-import marmalade.client.async.AsyncClient;
-import marmalade.client.async.DefaultAsyncClient;
-import marmalade.client.sync.DefaultSyncClient;
-import marmalade.client.sync.SyncClient;
 
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -184,23 +179,6 @@ public class Registry
       initialize();
    }
 
-   private static void fallbackRegisterService(Class<?> type, Callable<?> load)
-   {
-      Registry defaultRegistry = instance();
-
-      Object impl = defaultRegistry.services.get(type);
-
-      if (impl == null) {
-         try {
-            impl = load.call();
-         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-         }
-      }
-
-      defaultRegistry.register(type, impl);
-   }
-
    private static void initialize()
    {
       if (!instances.containsKey(NS_DEFAULT)) {
@@ -283,36 +261,6 @@ public class Registry
          Registry registry = getOrCreate(contrib);
          registry.register(contrib.serviceClass(), contrib.serviceImpl());
       }
-
-      // Fallbacks
-
-      fallbackRegisterService(SyncClient.class, new Callable<SyncClient>()
-      {
-         @Override
-         public SyncClient call()
-         {
-            return new DefaultSyncClient();
-         }
-      });
-
-      fallbackRegisterService(AsyncClient.class, new Callable<AsyncClient>()
-      {
-         @Override
-         public AsyncClient call()
-         {
-            return new DefaultAsyncClient();
-         }
-      });
-
-      // Default mapper for conversions &c.
-      fallbackRegisterService(ObjectMapper.class, new Callable<ObjectMapper>()
-      {
-         @Override
-         public ObjectMapper call()
-         {
-            return new ObjectMapper();
-         }
-      });
    }
 
    private Registry(String namespace)

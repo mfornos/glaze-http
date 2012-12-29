@@ -45,7 +45,7 @@ public class RegistryShutdownHook extends Thread
    private void shutdownInstance(Registry instance)
    {
       LOGGER.info("Namespace: '{}'", instance.namespace());
-      
+
       Map<Class<?>, Object> services = instance.services();
 
       for (Class<?> clazz : services.keySet()) {

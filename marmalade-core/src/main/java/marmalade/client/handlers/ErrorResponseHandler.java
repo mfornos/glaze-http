@@ -5,16 +5,10 @@ import marmalade.client.Response;
 public class ErrorResponseHandler extends DefaultResponseHandler
 {
    private final ErrorHandler errorHandler;
-   
+
    public ErrorResponseHandler(ErrorHandler errorHandler)
    {
       this.errorHandler = errorHandler;
-   }
-
-   @Override
-   protected Response onResponse(Response response)
-   {
-      return response;
    }
 
    @Override
@@ -23,7 +17,11 @@ public class ErrorResponseHandler extends DefaultResponseHandler
       errorHandler.onError(response);
       return null;
    }
-   
-   
+
+   @Override
+   protected Response onResponse(Response response)
+   {
+      return response;
+   }
 
 }

@@ -17,15 +17,15 @@ public class DebugInterceptor implements HttpRequestInterceptor, HttpResponseInt
    private static final Logger LOGGER = LoggerFactory.getLogger(DebugInterceptor.class);
 
    @Override
-   public void process(HttpResponse response, HttpContext context) throws HttpException, IOException
-   {
-      LOGGER.info("Response: {}\nContext: {} ", response, context);
-   }
-
-   @Override
    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException
    {
       LOGGER.info("Request: {}\nContext: {} ", request.getAllHeaders(), context);
+   }
+
+   @Override
+   public void process(HttpResponse response, HttpContext context) throws HttpException, IOException
+   {
+      LOGGER.info("Response: {}\nContext: {} ", response, context);
    }
 
 }

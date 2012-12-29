@@ -8,6 +8,7 @@ import marmalade.client.handlers.ErrorHandler;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer;
 import org.apache.http.protocol.HttpContext;
@@ -39,5 +40,7 @@ public interface AsyncClient extends Client
    <T> Future<T> map(AsyncMap<T> mapRequest);
 
    AsyncClient reset();
+
+   HttpAsyncClient getHttpClient();
 
 }

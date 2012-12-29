@@ -64,6 +64,7 @@
   	<module>marmalade-test</module>
   	<module>marmalade-scala</module>
   	<module>marmalade-soup</module>
+  	<module>marmalade-defaults</module>
   </modules>
   
   <build>

@@ -55,6 +55,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+          <groupId>com.github.mfornos</groupId>
+          <artifactId>marmalade-defaults</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

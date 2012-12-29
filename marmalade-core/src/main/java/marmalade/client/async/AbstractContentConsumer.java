@@ -20,18 +20,20 @@ public abstract class AbstractContentConsumer<T> extends AbstractAsyncResponseCo
    private volatile SimpleInputBuffer buf;
 
    @Override
+   protected T buildResult(HttpContext paramHttpContext) throws Exception
+   {
+      return onBufferCompleted(this.buf);
+   }
+
+   abstract protected T onBufferCompleted(SimpleInputBuffer buf) throws IOException;
+
+   @Override
    protected void onContentReceived(ContentDecoder decoder, IOControl ioctrl) throws IOException
    {
       if (this.buf == null) {
          throw new IllegalStateException("Content buffer is null");
       }
       this.buf.consumeContent(decoder);
-   }
-
-   @Override
-   protected T buildResult(HttpContext paramHttpContext) throws Exception
-   {
-      return onBufferCompleted(this.buf);
    }
 
    @Override
@@ -46,8 +48,6 @@ public abstract class AbstractContentConsumer<T> extends AbstractAsyncResponseCo
       }
       this.buf = new SimpleInputBuffer((int) len, new HeapByteBufferAllocator());
    }
-
-   abstract protected T onBufferCompleted(SimpleInputBuffer buf) throws IOException;
 
    @Override
    protected void releaseResources()

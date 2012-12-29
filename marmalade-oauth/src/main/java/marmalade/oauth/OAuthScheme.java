@@ -1,5 +1,7 @@
 package marmalade.oauth;
 
+import marmalade.oauth.creds.OAuthCredentials;
+
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.annotation.NotThreadSafe;

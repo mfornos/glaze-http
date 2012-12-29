@@ -32,7 +32,7 @@ public final class MimeResolver
    private static String resolveFromEntity(HttpResponse response)
    {
       String mime = ContentType.APPLICATION_JSON.getMimeType();
-      
+
       HttpEntity entity = response.getEntity();
       if (entity != null) {
          Header header = Optional.fromNullable(entity.getContentType()).or(DEFAULT_HEADER);

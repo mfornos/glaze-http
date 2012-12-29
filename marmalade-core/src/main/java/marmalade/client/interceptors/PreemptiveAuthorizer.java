@@ -45,7 +45,7 @@ public class PreemptiveAuthorizer implements HttpRequestInterceptor
       AuthSchemeRegistry schemes = (AuthSchemeRegistry) context.getAttribute(ClientContext.AUTHSCHEME_REGISTRY);
       HttpParams params = request.getParams();
       AuthScheme scheme = schemes.getAuthScheme(schemeName, params);
-      
+
       if (scheme != null) {
          AuthScope targetScope = new AuthScope(target.getHostName(), target.getPort(), scheme.getRealm(), scheme.getSchemeName());
          Credentials creds = provider.getCredentials(targetScope);

@@ -73,14 +73,6 @@ public interface SyncClient extends Client
    <T> T map(SyncMap<T> mapRequest);
 
    /**
-    * Specifies the authorization chain.
-    * 
-    * @param authpref
-    *           An ordered list of authorization schemes
-    */
-   void proxyAuthPref(String... authpref);
-
-   /**
     * Registers a scheme on the underlying connection manager.
     * 
     * @param scheme

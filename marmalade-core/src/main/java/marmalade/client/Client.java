@@ -5,6 +5,7 @@ import marmalade.spi.Dispose;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.auth.AuthSchemeFactory;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CookieStore;
@@ -37,6 +38,14 @@ public interface Client
 
    Client authPreemptiveProxy(final HttpHost host);
 
+   /**
+    * Specifies the authorization chain.
+    * 
+    * @param authpref
+    *           An ordered list of authorization schemes
+    */
+   void proxyAuthPref(String... authpref);
+
    Client clearAuth();
 
    Client clearCookies();
@@ -56,5 +65,7 @@ public interface Client
     */
    @Dispose
    void shutdown();
+
+   void registerAuthScheme(String schemeName, AuthSchemeFactory schemeFactory);
 
 }

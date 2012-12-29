@@ -16,27 +16,27 @@ public class SyncMap<T> extends MapRequest<T>
       super(request, type);
    }
 
+   public SyncMap(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   {
+      super(namespace, request, type, errorHandler);
+   }
+
    public SyncMap(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler,
          ContentType overrideType)
    {
       super(namespace, request, type, errorHandler, overrideType);
    }
 
-   public SyncMap(String namespace, HttpUriRequest request, Class<T> type, ErrorHandler errorHandler)
+   public SyncMap(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
+         ErrorHandler errorHandler)
    {
-      super(namespace, request, type, errorHandler);
+      super(namespace, request, type, context, errorHandler);
    }
 
    public SyncMap(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
          ErrorHandler errorHandler, ContentType overrideType)
    {
       super(namespace, request, type, context, errorHandler, overrideType);
-   }
-
-   public SyncMap(String namespace, HttpUriRequest request, Class<T> type, HttpContext context,
-         ErrorHandler errorHandler)
-   {
-      super(namespace, request, type, context, errorHandler);
    }
 
    public MapperResponseHandler<T> getHandler()

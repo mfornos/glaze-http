@@ -1,0 +1,4 @@
+marmalade.spi.DefaultSyncClientProvider
+marmalade.spi.DefaultAsyncClientProvider
+marmalade.spi.DefaultMapperProvider
+
