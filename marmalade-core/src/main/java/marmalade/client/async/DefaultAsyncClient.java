@@ -1,5 +1,6 @@
 package marmalade.client.async;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 
@@ -26,6 +27,7 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.nio.client.AbstractHttpAsyncClient;
 import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
@@ -52,6 +54,7 @@ import com.google.common.base.Preconditions;
  */
 public class DefaultAsyncClient extends BaseClient implements AsyncClient
 {
+
    static class RequestProducerImpl extends BasicAsyncRequestProducer
    {
       public RequestProducerImpl(HttpHost target, HttpRequest request)
@@ -281,6 +284,13 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
 
       if (HttpAsyncContentProducer.class.isAssignableFrom(entity.getClass())) {
          producer = new RequestProducerImpl(target, entityRequest, (HttpAsyncContentProducer) entity);
+      } else if (MultipartEntity.class.isAssignableFrom(entity.getClass())) {
+         // TODO investigate zero copy multipart (not zero copy raw file transfer...)
+         try {
+            producer = new RequestProducerImpl(target, entityRequest, new EntityAsyncContentProducer(new BufferedMultipartEntity((MultipartEntity) entity)));
+         } catch (IOException e) {
+            throw new MarmaladeException(e);
+         }
       } else {
          producer = new RequestProducerImpl(target, entityRequest, new EntityAsyncContentProducer(entity));
       }

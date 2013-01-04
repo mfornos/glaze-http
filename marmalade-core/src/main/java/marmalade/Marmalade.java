@@ -1591,6 +1591,4 @@ public final class Marmalade
       return entity == null && bean != null && RequestUtil.isEnclosingEntity(request) && hasContentType();
    }
 
-   // TODO zero copy multipart
-
 }
