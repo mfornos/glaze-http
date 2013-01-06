@@ -17,6 +17,7 @@ import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.auth.AuthSchemeFactory;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.scheme.Scheme;
@@ -90,19 +91,12 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       return this;
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#execute(org.apache.http.client.methods.
-    * HttpUriRequest )
-    */
    @Override
    public Response execute(HttpUriRequest request)
    {
       try {
          return new Response(httpClient.execute(request, prepareLocalContext()));
       } catch (IOException e) {
-         request.abort();
          throw new MarmaladeException(e);
       }
    }
@@ -121,63 +115,36 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
 
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#execute(org.apache.http.client.methods.
-    * HttpUriRequest , org.apache.http.protocol.HttpContext)
-    */
    @Override
    public Response execute(HttpUriRequest request, HttpContext context)
    {
       try {
          return new Response(httpClient.execute(request, context));
       } catch (IOException e) {
-         request.abort();
          throw new MarmaladeException(e);
       }
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#execute(org.apache.http.client.methods.
-    * HttpUriRequest , org.apache.http.client.ResponseHandler)
-    */
    @Override
    public <T> T execute(HttpUriRequest request, ResponseHandler<T> handler)
    {
       try {
          return httpClient.execute(request, handler, prepareLocalContext());
       } catch (IOException e) {
-         request.abort();
          throw new MarmaladeException(e);
       }
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#execute(org.apache.http.client.methods.
-    * HttpUriRequest , org.apache.http.client.ResponseHandler,
-    * org.apache.http.protocol.HttpContext)
-    */
    @Override
    public <T> T execute(HttpUriRequest request, ResponseHandler<T> handler, HttpContext context)
    {
       try {
          return httpClient.execute(request, handler, context);
       } catch (IOException e) {
-         request.abort();
          throw new MarmaladeException(e);
       }
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#getHttpClient()
-    */
    @Override
    public HttpClient getHttpClient()
    {
@@ -219,11 +186,6 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       return execute(mapRequest.getRequest(), mapRequest.getHandler(), context);
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#proxyAuthPref(java.lang.String)
-    */
    @Override
    public void proxyAuthPref(String... authpref)
    {
@@ -237,35 +199,25 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       ((AbstractHttpClient) httpClient).getAuthSchemes().register(schemeName, schemeFactory);
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * marmalade.client.SyncClient#registerScheme(org.apache.http.conn.scheme
-    * .Scheme )
-    */
    @Override
    public void registerScheme(final Scheme scheme)
    {
       httpClient.getConnectionManager().getSchemeRegistry().register(scheme);
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#shutdown()
-    */
+   @Override
+   public Client retryHandler(HttpRequestRetryHandler retryHandler)
+   {
+      ((AbstractHttpClient) getHttpClient()).setHttpRequestRetryHandler(retryHandler);
+      return this;
+   }
+
    @Override
    public void shutdown()
    {
       httpClient.getConnectionManager().shutdown();
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#trustSelfSignedCertificates()
-    */
    @Override
    public void trustSelfSignedCertificates()
    {
@@ -277,11 +229,6 @@ public class DefaultSyncClient extends BaseClient implements SyncClient
       }
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see marmalade.client.SyncClient#unregisterScheme(java.lang.String)
-    */
    @Override
    public void unregisterScheme(final String name)
    {

@@ -6,6 +6,7 @@ import marmalade.client.handlers.ErrorHandler;
 import marmalade.func.Closures.ResponseClosure;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.scheme.Scheme;
@@ -92,5 +93,7 @@ public interface SyncClient extends Client
     *           The scheme name
     */
    void unregisterScheme(final String name);
+
+   Client retryHandler(HttpRequestRetryHandler retryHandler);
 
 }

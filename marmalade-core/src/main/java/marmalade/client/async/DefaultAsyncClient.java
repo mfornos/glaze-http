@@ -259,6 +259,7 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
       httpClient.getConnectionManager().getSchemeRegistry().unregister(name);
    }
 
+   @Override
    protected BasicHttpContext prepareLocalContext()
    {
       BasicHttpContext ctx = super.prepareLocalContext();
@@ -285,7 +286,8 @@ public class DefaultAsyncClient extends BaseClient implements AsyncClient
       if (HttpAsyncContentProducer.class.isAssignableFrom(entity.getClass())) {
          producer = new RequestProducerImpl(target, entityRequest, (HttpAsyncContentProducer) entity);
       } else if (MultipartEntity.class.isAssignableFrom(entity.getClass())) {
-         // TODO investigate zero copy multipart (not zero copy raw file transfer...)
+         // TODO investigate zero copy multipart (not zero copy raw file
+         // transfer...)
          try {
             producer = new RequestProducerImpl(target, entityRequest, new EntityAsyncContentProducer(new BufferedMultipartEntity((MultipartEntity) entity)));
          } catch (IOException e) {
