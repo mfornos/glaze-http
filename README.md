@@ -13,6 +13,10 @@ Provides:
 
 ## Basic Usage
 
+```java
+static import glaze.Glaze.*;
+```
+
 ### Mapping
 
 ```java
@@ -346,13 +350,13 @@ object MashapeApp extends GlazeHelpers {
 ```
 
 Enjoy!
-                 ____
-   ________     /   /   
-  / ____/ /___ /_  / ___  
- / / __/ / __ `// / / _ \
-/ /_/ / / /_/ // /_/  __/ 
-\____/_/\__,_//   /\___/  HTTP delight
-             /___/
+                    ____
+      ________     /   /   
+     / ____/ /___ /_  / ___  
+    / / __/ / __ `// / / _ \
+   / /_/ / / /_/ // /_/  __/ 
+   \____/_/\__,_//   /\___/  HTTP delight
+                /___/
 
 be cool and play nice.
 
