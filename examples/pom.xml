@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>Marmalade - Examples</name>
+	<name>Glaze - Examples</name>
 	<groupId>com.github.mfornos</groupId>
-	<artifactId>marmalade-examples</artifactId>
+	<artifactId>glaze-examples</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -16,17 +16,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.mfornos</groupId>
-			<artifactId>marmalade-scala</artifactId>
+			<artifactId>glaze-scala</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.mfornos</groupId>
-			<artifactId>marmalade-defaults</artifactId>
+			<artifactId>glaze-defaults</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
             <groupId>com.github.mfornos</groupId>
-            <artifactId>marmalade-oauth</artifactId>
+            <artifactId>glaze-oauth</artifactId>
             <version>${project.version}</version>
         </dependency>
 		<dependency>
