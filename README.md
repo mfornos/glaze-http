@@ -1,13 +1,13 @@
 # Glaze HTTP [![Build Status](https://travis-ci.org/mfornos/glaze-http.png?branch=master)](https://travis-ci.org/mfornos/glaze-http)
 
-Fluent API for comfortable HTTP interactions. Glaze HTTP offers a simple yet complete toolkit to ease the building of powerful REST clients.
+Fluent API for comfortable HTTP interactions. Glaze offers a simple yet complete toolkit to ease the building of powerful REST clients.
 
 Provides:
 
 * Automatic serialization/deserialization by content type
 * Easy form handling, including multipart requests
 * Easy asynchronous HTTP interaction over NIO
-* Easy Error handling
+* Easy error handling
 * Convenient facilities for local multi-threaded and remote distributed executors
 * Pluggable mappers and services
 

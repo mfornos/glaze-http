@@ -1,5 +1,5 @@
 (ns
-  #^{:doc "Simple Marmalade usage patterns from Clojure"}
+  #^{:doc "Simple Glaze usage patterns from Clojure"}
   glaze.examples.simple
   (:import 
     (glaze.client.handlers ErrorHandler)
