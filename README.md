@@ -350,6 +350,7 @@ object MashapeApp extends GlazeHelpers {
 ```
 
 Enjoy!
+
                      ____
        ________     /   /   
       / ____/ /___ /_  / ___  
@@ -357,6 +358,7 @@ Enjoy!
     / /_/ / / /_/ // /_/  __/ 
     \____/_/\__,_//   /\___/  HTTP delight
                  /___/
+
 
 be cool and play nice.
 
