@@ -1,0 +1,110 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>glaze</artifactId>
+		<groupId>com.github.mfornos</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>com.github.mfornos</groupId>
+	<artifactId>glaze-scala</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Glaze - Scala</name>
+	
+	<properties>
+	  <scala.version>2.9.2</scala.version>
+	  <jackson-scala.version>2.1.2</jackson-scala.version>
+	  <scalatest.version>2.0.M4</scalatest.version>
+	  <scalatest-plugin.version>1.0-M2</scalatest-plugin.version>
+	  <scala-plugin.version>2.15.2</scala-plugin.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-scala</artifactId>
+			<version>${jackson-scala.version}</version>
+			<exclusions>
+			  <exclusion>
+			    <groupId>org.scala-lang</groupId>
+			    <artifactId>scala-library</artifactId>
+			  </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.mfornos</groupId>
+			<artifactId>glaze-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.9.1</artifactId>
+			<version>${scalatest.version}</version>
+			<scope>test</scope>
+		</dependency>
+	    <dependency>
+			<groupId>com.github.mfornos</groupId>
+			<artifactId>glazed-test</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+          <groupId>com.github.mfornos</groupId>
+          <artifactId>glaze-defaults</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src/main/scala</sourceDirectory>
+		<testSourceDirectory>src/test/scala</testSourceDirectory>
+		<plugins>
+			<!-- disable surefire -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.scalatest</groupId>
+				<artifactId>scalatest-maven-plugin</artifactId>
+				<version>${scalatest-plugin.version}</version>
+				<configuration>
+					<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>test</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<version>${scala-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

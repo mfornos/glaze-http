@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.mfornos</groupId>
+    <artifactId>glaze</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
+  <name>Glaze - Core</name>
+  <groupId>com.github.mfornos</groupId>
+  <artifactId>glaze-core</artifactId>
+  <packaging>jar</packaging>
+  
+  <properties>
+    <jackson.version>2.1.1</jackson.version>
+    <httpasync.version>4.0-beta3</httpasync.version>
+    <guava.version>13.0.1</guava.version>
+    <snakeyaml.version>1.11</snakeyaml.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>${httpclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpasyncclient</artifactId>
+      <version>${httpasync.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-afterburner</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.mfornos</groupId>
+      <artifactId>glazed-test</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
