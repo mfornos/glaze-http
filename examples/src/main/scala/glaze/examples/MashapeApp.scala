@@ -1,16 +1,16 @@
 
 package marmalade.examples
 
-import marmalade.Marmalade._
-import marmalade.client.UriBuilder._
+import glaze.Glaze._
+import glaze.client.UriBuilder._
 import org.apache.http.HttpResponse
-import marmalade.client.Response
-import marmalade.scala.MarmaladeHelpers
+import glaze.client.Response
+import glaze.scala.GlazeHelpers
 import com.fasterxml.jackson.annotation._
-import marmalade.examples.mashape.MashapeClient
+import glaze.examples.mashape.MashapeClient
 import java.util.Date
 
-object MashapeApp extends MarmaladeHelpers {
+object MashapeApp extends GlazeHelpers {
 
   class Forecast @JsonCreator() (
     @JsonProperty("day_of_week") val dayOfWeek: String,

@@ -1,4 +1,4 @@
-# Glaze HTTP
+# Glaze HTTP [![Build Status](https://travis-ci.org/mfornos/glaze-http.png?branch=master)](https://travis-ci.org/mfornos/glaze-http)
 
 Fluent API for comfortable HTTP interactions. Glaze HTTP offers a simple yet complete toolkit to ease the building of powerful REST clients.
 

@@ -1,14 +1,14 @@
 (ns
   #^{:doc "Simple Marmalade usage patterns from Clojure"}
-  marmalade.examples.simple
+  glaze.examples.simple
   (:import 
-    (marmalade.client.handlers ErrorHandler)
+    (glaze.client.handlers ErrorHandler)
     (org.apache.http.client ResponseHandler)
     (org.apache.http.util EntityUtils))
   (:use clojure.contrib.import-static)
   (:gen-class))
 
-(import-static marmalade.Marmalade Get Post)
+(import-static glaze.Glaze Get Post)
 
 ;; $ lein run http://www.ask.com
 

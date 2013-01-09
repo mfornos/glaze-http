@@ -1,19 +1,19 @@
-package marmalade.examples
+package glaze.examples
 
 import scala.collection.mutable
 
-import marmalade.Marmalade._
-import marmalade.client.UriBuilder._
+import glaze.Glaze._
+import glaze.client.UriBuilder._
 
 import org.apache.http.entity.ContentType
 import org.apache.http.HttpResponse
 import org.apache.http.util.EntityUtils
-import marmalade.client.Response
-import marmalade.client.handlers.ErrorHandler
-import marmalade.scala.MarmaladeHelpers
-import marmalade.client.handlers.DefaultResponseHandler
+import glaze.client.Response
+import glaze.client.handlers.ErrorHandler
+import glaze.scala.GlazeHelpers
+import glaze.client.handlers.DefaultResponseHandler
 
-object SimpleApp extends MarmaladeHelpers {
+object SimpleApp extends GlazeHelpers {
 
   def main(args: Array[String]): Unit = {
 
