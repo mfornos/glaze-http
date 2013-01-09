@@ -14,7 +14,7 @@ Provides:
 ## Basic Usage
 
 ```java
-static import glaze.Glaze.*;
+import static glaze.Glaze.*;
 ```
 
 ### Mapping
