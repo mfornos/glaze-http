@@ -7,7 +7,7 @@ Provides:
 * Automatic serialization/deserialization by content type
 * Easy form handling, including multipart requests
 * Easy asynchronous HTTP interaction over NIO
-* Error handling
+* Easy Error handling
 * Convenient facilities for local multi-threaded and remote distributed executors
 * Pluggable mappers and services
 
