@@ -1,0 +1,424 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Glaze HTTP</title>
+  <link href="css/style.css" rel="stylesheet" type="text/css"/>
+  <link href="css/lade.css" rel="stylesheet" type="text/css"/>
+  <link href="js/uitotop/css/ui.totop.css" rel="stylesheet" type="text/css"/>
+  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+  <link rel="shortcut icon" href="favicon.png" type="image/png" />
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/uitotop/js/easing.js"></script>
+  <script src="js/uitotop/js/jquery.ui.totop.min.js"></script>
+  <script src="js/jquery.tabs.js"></script>
+  <script src="js/highlight.pack.js"></script>
+    <script>
+
+$(document).ready(function() {
+ 
+	$("div.tabs").tabify();
+  $().UItoTop({ easingType: 'easeOutQuart' });
+ 
+});
+      hljs.tabReplace = '    ';
+      hljs.initHighlightingOnLoad();
+    </script>
+  	<script>
+	/* grunticon Stylesheet Loader | https://github.com/filamentgroup/grunticon | (c) 2012 Scott Jehl, Filament Group, Inc. | MIT license. */
+window.grunticon=function(e,t){if(!e||e.length!==3)return;var n=window,r=!!n.document.createElementNS&&!!n.document.createElementNS("http://www.w3.org/2000/svg","svg").createSVGRect,i=function(t){var i=n.document.createElement("link"),s=n.document.getElementsByTagName("script")[0];i.rel="stylesheet",i.href=e[t&&r?0:t?1:2],s.parentNode.insertBefore(i,s)},s=new n.Image;s.onerror=function(){i(!1)},s.onload=function(){i(s.width===1&&s.height===1)},s.src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="};
+grunticon( [ "css/icons/icons.data.svg.css", "css/icons/icons.data.png.css", "css/icons/icons.fallback.css" ] );
+		</script>
+	<noscript><link href="css/icons/icons.fallback.css" rel="stylesheet"></noscript>
+</head>
+<body>
+<header>
+  <div class="wrapper">
+	<div class="icon iconlollipop_white"></div>
+	<div class="main-title">
+	  <h1>Glaze</h1>
+	  <h2>HTTP delight</h2>
+    </div>
+    <div id="nav">
+    	<a href="#usage">Usage</a>
+    	<a href="#example">Examples</a>
+      <a href="https://github.com/mfornos/glaze-http"><i class="icon-github-alt"></i> Github</a>
+    </div>
+  </div>
+</header>
+<section class="feature">
+  <div class="wrapper">
+    <p>
+	<strong>Fluent API</strong> for comfortable HTTP interactions. Glaze offers a simple yet complete toolkit to ease the building of <strong>powerful REST clients</strong>.
+    </p>
+  </div>
+</section>
+<section>
+  <div class="wrapper">
+  	<div class="lcol">
+  	<h2>Features</h2>
+  </div>
+  <div class="inner">
+    <ul class="features">
+<li>Automatic serialization/deserialization by content type</li>
+<li>Easy form handling, including multipart requests</li>
+<li>Easy asynchronous HTTP interaction over NIO</li>
+<li>Easy error handling</li>
+<li>Convenient facilities for local multi-threaded and remote distributed executors</li>
+<li>Pluggable mappers and services</li>
+</ul>
+</div>
+</div>
+</section>
+<section>
+  <div class="wrapper">
+    <div class="lcol">
+    <h2>Modules</h2>
+  </div>
+  <div class="inner">
+    <dl>
+<dt>glaze-oauth</dt>
+<dd><a href="http://oauth.net/">OAuth <i class="icon-external-link"></i></a> support. Includes authentication flow handling.</dd>
+<dt>glaze-soup</dt>
+<dd><a href="http://jsoup.org/">JSoup <i class="icon-external-link"></i></a> support.</dd>
+<dt>glaze-test</dt>
+<dd><a href="http://www.simpleframework.org/">Simple server <i class="icon-external-link"></i></a> test suite.</dd>
+<dt>glaze-scala</dt>
+<dd>Basic scala helpers.</dd>
+</dl>
+</div>
+</div>
+</section>
+<section>
+  <div class="wrapper">
+  <a name="usage"></a>
+<h2>Basic Usage</h2>
+
+<div style="margin-bottom: 15px;">
+  <pre><code class="java">import static glaze.Glaze.*;</code></pre>
+</div>
+
+<div class="usage tabs">
+<ul class="tabs">
+     <li><a href="#mapping">Mapping</a></li>
+     <li><a href="#async">Asynchronous interaction</a></li>
+     <li><a href="#multipart">Multipart</a></li>
+</ul>
+<div id="mapping">
+<pre><code class="java">// Simple map
+Map&lt;String, Object&gt; result = Get(uri).map();
+ 
+// Map a bean
+MyBean out = Get(uri).map(MyBean.class);
+ 
+// Map with error handling
+MyBean out = Get(uri).withErrorHandler(new ErrorHandler(){...}).map(MyBean.class);
+ 
+// Post a bean as url-encoded content
+Post(uri).bean(in).send();
+ 
+// Post a bean as json
+Post(uri).bean(in).as(APPLICATION_JSON).send();
+ 
+// or
+Post(uri, APPLICATION_JSON).bean(in).send();
+ 
+// Post a bean as json and get the response mapped back to a bean according to
+// the response content-type
+MyBean out = Post(uri).bean(in).as(APPLICATION_JSON).map(MyBean.class);
+ 
+// force to be mapped back from xml ignoring the response content-type. i.e.
+// broken headers
+Post(uri).bean(in).as(APPLICATION_JSON).map(MyBean.class, APPLICATION_XML);</code></pre>
+</div>
+<div id="async">
+<pre><code class="java">// Basic send async 
+Future&lt;HttpResponse&gt; out = Get(uri).sendAsync();
+out.get();
+ 
+// Basic map async
+Future&lt;MyBean&gt; out = Get(uri).mapAsync(MyBean.class);
+out.get();
+ 
+// With consumer
+Future&lt;MyResult&gt; out = Get(uri).withConsumer(myAsyncConsumer).executeAsync();
+out.get();</code></pre>
+</div>
+<div id="multipart">
+<pre><code class="java">// Post a file
+Post(uri).bean(new File("myfile.png")).as(MULTIPART_FORM_DATA).send();
+
+// or
+Post(uri, MULTIPART_FORM_DATA).bean(new FileInputStream(file)).send();
+ 
+// or bytes 
+byte[] bytes = new byte[] { 0x1, 0x1, 0x1, 0x0, 0xB, 0xA, 0xB, 0xB, 0xE };
+ 
+Post(uri, MULTIPART_FORM_DATA).bean(bytes).send();
+ 
+// Post a bean annotated with specific multipart annotations 
+class MultipartBean
+{
+   @BinaryMultipart
+   private File attachment;
+ 
+   @BinaryMultipart(fileName = "tangerine.jpg", mime = "image/jpeg", name = "photo")
+   private File pht;
+ 
+   @TextMultipart
+   private String hello = "world!";
+ 
+   @TextMultipart(name = "ho", mime = "application/json")
+   private String hi = "{\"num\":1}";
+}
+ 
+Post(uri).bean(multipartBean).as(MULTIPART_FORM_DATA).send();</code></pre>
+</div>
+</div>
+</section>
+<section><div class="wrapper">
+<a name="example"></a>
+<h2>Writing a Twitter Client</h2>
+<p>
+You will need <strong>glaze-oauth</strong> module to access <a href="https://dev.twitter.com/docs/api/1.1">Twitter 1.1 API</a>.
+</p><p>
+For a full working example with OAuth flow included look at: <em>examples/src/main/java/glaze/examples/twitter</em>
+</p><p>
+In the example we will create an asynchronous client, if you want a synchronous one just extend DefaultSyncClient and call non-async methods.
+</p>
+<div class="example tabs">
+<ul class="tabs">
+     <li><a href="#app">App.java</a></li>
+     <li><a href="#api">TwitterApi.java</a></li>
+     <li><a href="#client">TwitterClient.java</a></li>
+     <li><a href="#config">TwitterConfig.java</a></li>
+</ul>
+<div id="app">
+<pre><code class="java">public class App
+{
+
+   public static void main(String[] args) throws IOException, OAuthException
+   {
+      TwitterApi api = new TwitterApi(new PreemptiveTwitterClient());
+
+      Tweet[] tweets = api.homeTimeline();
+
+      for (Tweet tweet : tweets) {
+         System.out.println(tweet);
+      }
+
+      System.exit(0);
+   }
+}
+</code></pre>
+</div>
+<div id="api">
+<pre><code class="java">public class TwitterApi
+{
+   private static final String BASE_URI = "https://api.twitter.com/1.1";
+
+   private final TwitterClient client;
+
+   public TwitterApi()
+   {
+      this(Registry.lookup(TwitterClient.class));
+   }
+
+   public TwitterApi(TwitterClient client)
+   {
+      Preconditions.checkNotNull(client);
+
+      this.client = client;
+   }
+
+   public Tweet[] homeTimeline()
+   {
+      try {
+         return promiseHomeTimeline().get();
+      } catch (Exception e) {
+         throw new TwitterApiException(e);
+      }
+   }
+
+   public Future<Tweet[]> promiseHomeTimeline()
+   {
+      return Get(svcPath("/statuses/home_timeline.json").build()).mapAsync(client, Tweet[].class);
+   }
+
+   public void shutdown()
+   {
+      client.shutdown();
+   }
+
+   private UriBuilder svcPath(Object... paths)
+   {
+      return uriBuilderFrom(BASE_URI).appendPaths(paths);
+   }
+
+}</code></pre>
+</div>
+<div id="client">
+ <pre><code class="java">public class PreemptiveTwitterClient extends DefaultAsyncClient
+{
+   private String key;
+   private String secret;
+
+   public PreemptiveTwitterClient()
+   {
+      this(new ConfigCredentialsProvider(new TwitterConfig()));
+   }
+
+   public PreemptiveTwitterClient(OAuthCredentialsProvider provider)
+   {
+      enableAuth(provider);
+   }
+
+   @Override
+   public String getKey()
+   {
+      return key;
+   }
+
+   @Override
+   public String getSecret()
+   {
+      return secret;
+   }
+
+   @Override
+   public void setTokens(OAuthConsumer consumer)
+   {
+      ConsumerCredentialsProvider provider = 
+      new ConsumerCredentialsProvider(consumer);
+      enableAuth(provider);
+   }
+
+   private void enableAuth(OAuthCredentialsProvider provider)
+   {
+      this.key = provider.getKey();
+      this.secret = provider.getSecret();
+      OAuthClientHelper.enablePreemptiveAuth(this, provider);
+   }
+}
+</code></pre>
+</div>
+<div id="config">
+<pre><code class="java">public class TwitterConfig extends DefaultPropertyConfig implements OAuthConfig
+{
+   
+   public TwitterConfig()
+   {
+      super("twitter.config", "twitter.properties");
+   }
+
+   public String getKey()
+   {
+      return get("key");
+   }
+
+   public String getSecret()
+   {
+      return get("secret");
+   }
+
+   public String getTokenKey()
+   {
+      return get("token.key");
+   }
+
+   public String getTokenSecret()
+   {
+      return get("token.secret");
+   }
+
+}
+ </code></pre>
+ </div>
+</div>
+</section>
+<section>
+  <div class="wrapper">
+    <h2>JVM languages</h2>
+    <div class="langs tabs">
+<ul class="tabs">
+     <li><a href="#scala">Scala</a></li>
+     <li><a href="#clojure">Clojure</a></li>
+</ul>
+<div id="scala">
+    <pre><code class="scala">object MashapeApp extends GlazeHelpers {
+
+  class Forecast @JsonCreator() (
+    @JsonProperty("day_of_week") val dayOfWeek: String,
+    @JsonProperty("low") val low: Integer, // Fahrenheit
+    @JsonProperty("high") val high: Integer,
+    @JsonProperty("condition") val condition: String) {
+    override def toString: String = "%s L%s° H%s°F - %s\n".format(dayOfWeek, low, high, condition)
+  }
+
+  def main(args: Array[String]): Unit = {
+
+    val mcli = new MashapeClient
+    val uri = uriBuilderFrom("https://george-vustrey-weather.p.mashape.com/api.php")
+              .addParameter("_method", "getForecasts")
+              .addParameter("location", "Barcelona")
+              .build
+
+    try {
+      val forecasts = Get(uri).withErrorHandler { r: Response =>
+        println("Error: %s".format(r))
+      }.mapAsync(mcli, classOf[Array[Forecast]])
+
+      println("%s @%s\n".format(where, new Date))
+
+      forecasts.get.foreach(forecast => println(forecast))
+
+    } finally { mcli.shutdown }
+
+  }
+
+}</code></pre>
+</div>
+<div id="clojure">
+    <pre><code class="clojure">(defn map-request [uri]
+  "Maps a Get request with an ErrorHandler"
+  (.. (Get uri)
+        (withErrorHandler 
+          (reify ErrorHandler
+            (onError[this response] 
+              (println (str response " error went through handler")))))
+        map))
+
+(defn send-request-rh [uri]
+  "Sends a Get request with a ResponseHandler"
+  (.. (Get uri)
+        (withHandler 
+          (reify ResponseHandler
+            (handleResponse[this response] 
+              (println (str response " went through handler"))
+              (EntityUtils/toString (.getEntity response)))))
+        send))
+
+(defn send-request-eh [uri]
+  "Sends a Get request with an ErrorHandler"
+  (.. (Get uri)
+        (withErrorHandler 
+          (reify ErrorHandler
+            (onError[this response] 
+              (println (str response " error went through handler")))))
+        send))
+
+(defn send-request [uri]
+  "Sends a Get request"
+  (.. (Get uri) send))</code></pre>
+  </div>
+</div>
+</section>
+<footer>
+  <div class="wrapper">
+  <p>Project mantained by <a href="https://github.com/mfornos"><i class="icon-coffee"></i> mfornos</a></p>
+  <p class="sec">
+    <a href="http://thenounproject.com/noun/lollipop/#icon-No1451" target="_blank">Lollipop</a> designed by <a href="http://thenounproject.com/Benoit" target="_blank">benoit</a> from The Noun Project
+  </p>
+</div>
+</footer>
+</body>
+</html>
