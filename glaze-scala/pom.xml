@@ -51,8 +51,8 @@
 		</dependency>
 	    <dependency>
 			<groupId>com.github.mfornos</groupId>
-			<artifactId>glazed-test</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>glaze-test</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
