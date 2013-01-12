@@ -52,7 +52,7 @@
     <dependency>
       <groupId>com.github.mfornos</groupId>
       <artifactId>glazed-test</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

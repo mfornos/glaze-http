@@ -8,6 +8,13 @@
 	<packaging>jar</packaging>
 
     <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+      <maven.compile.source>1.6</maven.compile.source>
+      <maven.compile.target>1.6</maven.compile.target>
+      <maven.compile.deprecation>true</maven.compile.deprecation>
+      <compiler.version>3.0</compiler.version>
+      
       <hazelcast.version>2.4</hazelcast.version>
       <lombok.version>0.11.6</lombok.version>
       <cli-parser.version>1.1</cli-parser.version>
@@ -46,4 +53,18 @@
           <scope>provided</scope>
         </dependency>
 	</dependencies>
+	<build>
+	  <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${compiler.version}</version>
+          <configuration>
+            <source>${maven.compile.source}</source>
+            <target>${maven.compile.target}</target>
+            <showDeprecations>${maven.compile.deprecation}</showDeprecations>
+          </configuration>
+        </plugin>
+      </plugins>
+	</build>
 </project>
