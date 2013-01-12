@@ -21,7 +21,7 @@ import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.HttpEntity
 import scala.reflect.BeanProperty
 
-class SpecMarmaladeHelpers extends HttpSpec {
+class SpecGlazeHelpers extends HttpSpec {
 
   "Get request" should "get 200 OK" in withHttpServer { server =>
     server.expect(when("GET").path("/").respond("OK"))

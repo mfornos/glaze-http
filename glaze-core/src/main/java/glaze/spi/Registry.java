@@ -328,7 +328,7 @@ public class Registry
 
    void logState()
    {
-      String title = "Marmalade Registry";
+      String title = "Glaze Registry";
       StringBuilder msg = new StringBuilder("\n");
       msg.append(title);
       msg.append("\n");
