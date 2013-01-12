@@ -6,7 +6,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <groupId>com.github.mfornos</groupId>
-  <artifactId>glazed-test</artifactId>
+  <artifactId>glaze-test</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Glaze - Test</name>
   
