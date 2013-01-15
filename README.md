@@ -13,13 +13,13 @@ Provides:
 
 ## Getting Started
 
-1. Clone the project. $ __git clone https://github.com/mfornos/glaze-http.git__
+1. $ __git clone https://github.com/mfornos/glaze-http.git__
 2. $ __cd glaze-http__
 3. $ __mvn install__
 
 Jar packages will be available on [module-name]/target/ directories. For more information see [fork a repo help](https://help.github.com/articles/fork-a-repo). 
 
-* _soon available at Maven Central_
+_Soon available at Maven Central_.
 
 ## The Basics
 
