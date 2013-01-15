@@ -13,9 +13,9 @@
 	<name>Glaze - Scala</name>
 	
 	<properties>
-	  <scala.version>2.9.2</scala.version>
+	  <scala.version>2.10.0</scala.version>
 	  <jackson-scala.version>2.1.2</jackson-scala.version>
-	  <scalatest.version>2.0.M4</scalatest.version>
+	  <scalatest.version>2.0.M5</scalatest.version>
 	  <scalatest-plugin.version>1.0-M2</scalatest-plugin.version>
 	  <scala-plugin.version>2.15.2</scala-plugin.version>
 	</properties>
@@ -45,7 +45,7 @@
 		
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.9.1</artifactId>
+			<artifactId>scalatest_2.10.0</artifactId>
 			<version>${scalatest.version}</version>
 			<scope>test</scope>
 		</dependency>
