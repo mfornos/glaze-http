@@ -17,7 +17,7 @@ Provides:
 2. $ __cd glaze-http__
 3. $ __mvn install__
 
-Jar packages will be available on [module-name]/target/ directories. For more information see [fork a repo help](https://help.github.com/articles/fork-a-repo). 
+Jar packages will appear under _module-name_/target/ directories. For more information see [fork a repo help](https://help.github.com/articles/fork-a-repo). 
 
 _Soon available at Maven Central_.
 
