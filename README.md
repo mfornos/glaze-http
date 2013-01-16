@@ -19,6 +19,8 @@ Provides:
 
 Jar packages will appear under _module-name_/target/ directories. For more information see [fork a repo help](https://help.github.com/articles/fork-a-repo). 
 
+Note that __glaze-defaults__ is required to hook the default providers.
+
 _Soon available at Maven Central_.
 
 ## The Basics
