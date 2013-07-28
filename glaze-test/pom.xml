@@ -5,9 +5,7 @@
     <groupId>com.github.mfornos</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.github.mfornos</groupId>
   <artifactId>glaze-test</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>Glaze - Test</name>
   
   <properties>

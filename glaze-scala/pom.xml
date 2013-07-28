@@ -7,14 +7,12 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	
-	<groupId>com.github.mfornos</groupId>
 	<artifactId>glaze-scala</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>Glaze - Scala</name>
 	
 	<properties>
 	  <scala.version>2.10.0</scala.version>
-	  <jackson-scala.version>2.1.2</jackson-scala.version>
+	  <jackson-scala.version>2.2.1</jackson-scala.version>
 	  <scalatest.version>2.0.M5</scalatest.version>
 	  <scalatest-plugin.version>1.0-M2</scalatest-plugin.version>
 	  <scala-plugin.version>2.15.2</scala-plugin.version>
@@ -23,7 +21,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-scala</artifactId>
+			<artifactId>jackson-module-scala_2.10</artifactId>
 			<version>${jackson-scala.version}</version>
 			<exclusions>
 			  <exclusion>

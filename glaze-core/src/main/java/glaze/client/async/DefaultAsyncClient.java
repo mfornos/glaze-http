@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
@@ -53,6 +52,9 @@ import com.google.common.base.Preconditions;
  * Default implementation of {@link AsyncClient}.
  * 
  */
+// TODO migrate to the new building pattern HttpAsyncClients.custom(),
+// RequestConfig, etc.
+// Nowadays in Beta, wait until an stable release is delivered
 public class DefaultAsyncClient extends BaseClient implements AsyncClient
 {
 

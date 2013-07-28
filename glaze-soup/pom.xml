@@ -5,13 +5,11 @@
     <groupId>com.github.mfornos</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.github.mfornos</groupId>
   <artifactId>glaze-soup</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>Glaze - Soup</name>
   
   <properties>
-    <jsoup.version>1.6.3</jsoup.version>
+    <jsoup.version>1.7.2</jsoup.version>
   </properties>
   
   <dependencies>

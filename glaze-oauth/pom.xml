@@ -7,7 +7,6 @@
   </parent>
   
   <name>Glaze - OAuth</name>
-  <groupId>com.github.mfornos</groupId>
   <artifactId>glaze-oauth</artifactId>
   <packaging>jar</packaging>
   

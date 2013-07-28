@@ -23,7 +23,7 @@
     
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
-    <httpclient.version>4.2.1</httpclient.version>
+    <httpclient.version>4.2.5</httpclient.version>
     
     <cobertura.version>2.5.2</cobertura.version>
     <javadoc.version>2.9</javadoc.version>
